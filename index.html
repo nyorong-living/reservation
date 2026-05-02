@@ -1,324 +1,399 @@
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  .app { font-family: 'Jost', sans-serif; font-weight: 300; background: var(--color-background-primary); min-height: 600px; padding: 2rem 1.5rem; color: var(--color-text-primary); }
-  .brand { text-align: center; margin-bottom: 2rem; }
-  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: 0.1em; }
-  .brand-sub { font-size: 11px; letter-spacing: 0.28em; color: var(--color-text-tertiary); text-transform: uppercase; margin-top: 4px; }
-  .step-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; }
-  .step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--color-border-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--color-text-tertiary); background: var(--color-background-primary); transition: all 0.25s; }
-  .step.active .step-dot { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
-  .step.done .step-dot { background: var(--color-background-secondary); border-color: #B0A0C8; color: #B0A0C8; }
-  .step-label { font-size: 10px; letter-spacing: 0.12em; color: var(--color-text-tertiary); }
-  .step.active .step-label { color: #B0A0C8; }
-  .step-line { flex: 1; height: 1px; background: var(--color-border-tertiary); max-width: 60px; margin-bottom: 18px; }
-  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 1.25rem; }
-
-  /* Combined date+time block */
-  .datetime-wrap { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 2rem; }
-  .cal-section { padding: 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); }
-  .time-section { padding: 1.25rem; }
-  .block-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 1rem; }
-
-  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-  .cal-title { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; }
-  .cal-nav { background: none; border: 0.5px solid var(--color-border-tertiary); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-  .cal-nav:hover { border-color: #B0A0C8; color: #B0A0C8; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .cal-dow { text-align: center; font-size: 10px; color: var(--color-text-tertiary); letter-spacing: 0.08em; padding: 4px 0 8px; }
-  .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: pointer; transition: all 0.2s; color: var(--color-text-primary); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-  .cal-day:hover:not(.disabled):not(.empty) { background: #ede8f5; }
-  .cal-day.selected { background: #B0A0C8; color: #fff; }
-  .cal-day.today { font-weight: 500; color: #9070B8; }
-  .cal-day.disabled { color: var(--color-text-tertiary); cursor: default; opacity: 0.35; }
-  .cal-day.empty { cursor: default; }
-
-  .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .time-slot { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: var(--color-text-secondary); }
-  .time-slot:hover:not(.disabled) { border-color: #B0A0C8; color: #9070B8; }
-  .time-slot.selected { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
-  .time-slot.disabled { opacity: 0.35; cursor: default; }
-
-  .service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
-  .service-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem 0.75rem; cursor: pointer; transition: all 0.2s; text-align: center; }
-  .service-card:hover { border-color: #B0A0C8; }
-  .service-card.selected { border: 1.5px solid #B0A0C8; background: #f5f0fa; }
-  .service-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
-  .service-duration { font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.06em; margin-bottom: 8px; }
-  .service-price { font-size: 14px; color: #9070B8; font-weight: 500; }
-
-  .form-group { margin-bottom: 1rem; }
-  .form-label { font-size: 11px; letter-spacing: 0.12em; color: var(--color-text-tertiary); display: block; margin-bottom: 6px; text-transform: uppercase; }
-  .form-input { width: 100%; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: var(--color-background-primary); color: var(--color-text-primary); transition: border-color 0.2s; }
-  .form-input:focus { outline: none; border-color: #B0A0C8; }
-
-  .summary-card { border: 0.5px solid #B0A0C8; border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; background: #f5f0fa; }
-  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid var(--color-border-tertiary); }
-  .summary-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; margin-top: 4px; }
-  .summary-label { color: var(--color-text-secondary); }
-  .summary-value.price { color: #9070B8; }
-
-  .btn-primary { width: 100%; background: #B0A0C8; border: none; border-radius: var(--border-radius-md); padding: 14px; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; cursor: pointer; font-family: 'Jost', sans-serif; transition: background 0.2s; margin-bottom: 0.75rem; }
-  .btn-primary:hover:not(:disabled) { background: #9070B8; }
-  .btn-primary:disabled { opacity: 0.4; cursor: default; }
-  .btn-secondary { width: 100%; background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 12px; font-size: 12px; letter-spacing: 0.1em; color: var(--color-text-secondary); cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.2s; }
-  .btn-secondary:hover { border-color: #B0A0C8; color: #B0A0C8; }
-
-  .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
-  .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #ede8f5; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 28px; }
-  .success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
-  .success-sub { font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 2rem; }
-  .booking-code { display: inline-block; border: 0.5px solid #B0A0C8; border-radius: var(--border-radius-md); padding: 8px 20px; font-size: 18px; letter-spacing: 0.25em; color: #9070B8; margin-bottom: 2rem; }
-
-  .page { display: none; }
-  .page.active { display: block; }
-</style>
-
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nyorong nail 嬉希工作室 — 線上預約</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #faf9fc; color: #2a2a2a; font-family: 'Jost', sans-serif; font-weight: 300; }
+    .app { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; min-height: 100vh; }
+    .inner { max-width: 480px; margin: 0 auto; }
+ 
+    .brand { text-align: center; margin-bottom: 2rem; }
+    .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: 0.1em; color: #2a2a2a; }
+    .brand-sub { font-size: 11px; letter-spacing: 0.28em; color: #aaa; text-transform: uppercase; margin-top: 4px; }
+ 
+    .step-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; }
+    .step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaa; background: #fff; transition: all 0.25s; }
+    .step.active .step-dot { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
+    .step.done .step-dot { background: #f0ecf7; border-color: #B0A0C8; color: #B0A0C8; }
+    .step-label { font-size: 10px; letter-spacing: 0.12em; color: #aaa; }
+    .step.active .step-label { color: #B0A0C8; }
+    .step-line { flex: 1; height: 1px; background: #e5e5e5; max-width: 60px; margin-bottom: 18px; }
+ 
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 1.25rem; color: #2a2a2a; }
+ 
+    .datetime-wrap { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 2rem; background: #fff; }
+    .cal-section { padding: 1.25rem; border-bottom: 0.5px solid #e0dce8; }
+    .time-section { padding: 1.25rem; }
+    .block-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; }
+ 
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .cal-title { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; }
+    .cal-nav { background: none; border: 0.5px solid #e0dce8; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .cal-nav:hover:not(:disabled) { border-color: #B0A0C8; color: #B0A0C8; }
+    .cal-nav:disabled { opacity: 0.25; cursor: default; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-dow { text-align: center; font-size: 10px; color: #aaa; letter-spacing: 0.08em; padding: 4px 0 8px; }
+    .cal-dow.weekend { color: #e07070; }
+    .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: default; transition: all 0.2s; color: #2a2a2a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+    .cal-day.weekend { color: #e07070; }
+    .cal-day.available { cursor: pointer; }
+    .cal-day.available:hover { background: #ede8f5; }
+    .cal-day.selected { background: #B0A0C8 !important; color: #fff !important; cursor: pointer; }
+    .cal-day.disabled { color: #ccc !important; opacity: 0.35; }
+    .cal-day.empty { }
+ 
+    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .time-slot { border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
+    .time-slot:hover { border-color: #B0A0C8; color: #9070B8; }
+    .time-slot.selected { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
+ 
+    .service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
+    .service-card { border: 0.5px solid #e0dce8; border-radius: 12px; padding: 1.25rem 0.75rem; cursor: pointer; transition: all 0.2s; text-align: center; background: #fff; }
+    .service-card:hover { border-color: #B0A0C8; }
+    .service-card.selected { border: 1.5px solid #B0A0C8; background: #f5f0fa; }
+    .service-name { font-size: 15px; font-weight: 500; color: #2a2a2a; margin-bottom: 6px; }
+    .service-duration { font-size: 11px; color: #aaa; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .service-price { font-size: 14px; color: #9070B8; font-weight: 500; }
+ 
+    .form-group { margin-bottom: 1rem; }
+    .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
+    .form-input { width: 100%; border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
+    .form-input:focus { outline: none; border-color: #B0A0C8; }
+ 
+    .summary-card { border: 0.5px solid #B0A0C8; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; background: #f5f0fa; }
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #e0dce8; }
+    .summary-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; margin-top: 4px; }
+    .summary-label { color: #666; }
+    .summary-value { color: #2a2a2a; }
+    .summary-value.price { color: #9070B8; }
+ 
+    .btn-primary { width: 100%; background: #B0A0C8; border: none; border-radius: 8px; padding: 14px; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; cursor: pointer; font-family: 'Jost', sans-serif; transition: background 0.2s; margin-bottom: 0.75rem; }
+    .btn-primary:hover:not(:disabled) { background: #9070B8; }
+    .btn-primary:disabled { opacity: 0.4; cursor: default; }
+    .btn-secondary { width: 100%; background: none; border: 0.5px solid #ccc; border-radius: 8px; padding: 12px; font-size: 12px; letter-spacing: 0.1em; color: #666; cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.2s; }
+    .btn-secondary:hover { border-color: #B0A0C8; color: #B0A0C8; }
+ 
+    .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
+    .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #ede8f5; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 28px; }
+    .success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+    .success-sub { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 2rem; }
+    .booking-code { display: inline-block; border: 0.5px solid #B0A0C8; border-radius: 8px; padding: 8px 20px; font-size: 18px; letter-spacing: 0.25em; color: #9070B8; margin-bottom: 2rem; }
+ 
+    .page { display: none; }
+    .page.active { display: block; }
+  </style>
+</head>
+<body>
 <div class="app">
-  <div class="brand">
-    <div class="brand-name">nyorong nail 嬉希工作室</div>
-    <div class="brand-sub">線上預約系統</div>
-  </div>
-
-  <div class="step-bar" id="stepBar">
-    <div class="step active" data-step="1"><div class="step-dot">1</div><div class="step-label">日期</div></div>
-    <div class="step-line"></div>
-    <div class="step" data-step="2"><div class="step-dot">2</div><div class="step-label">服務</div></div>
-    <div class="step-line"></div>
-    <div class="step" data-step="3"><div class="step-dot">3</div><div class="step-label">資訊</div></div>
-    <div class="step-line"></div>
-    <div class="step" data-step="4"><div class="step-dot">4</div><div class="step-label">確認</div></div>
-  </div>
-
-  <!-- Page 1: 日期 + 時間 -->
-  <div id="page1" class="page active">
-    <div class="section-title">選擇日期與時段</div>
-    <div class="datetime-wrap">
-      <div class="cal-section">
-        <div class="block-label">日期</div>
-        <div class="cal-header">
-          <button class="cal-nav" id="prevMonth">&#8249;</button>
-          <div class="cal-title" id="calTitle"></div>
-          <button class="cal-nav" id="nextMonth">&#8250;</button>
+  <div class="inner">
+    <div class="brand">
+      <div class="brand-name">nyorong nail 嬉希工作室</div>
+      <div class="brand-sub">線上預約系統</div>
+    </div>
+ 
+    <div class="step-bar" id="stepBar">
+      <div class="step active" data-step="1"><div class="step-dot">1</div><div class="step-label">日期</div></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2"><div class="step-dot">2</div><div class="step-label">服務</div></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3"><div class="step-dot">3</div><div class="step-label">資訊</div></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="4"><div class="step-dot">4</div><div class="step-label">確認</div></div>
+    </div>
+ 
+    <!-- Page 1 -->
+    <div id="page1" class="page active">
+      <div class="section-title">選擇日期與時段</div>
+      <div class="datetime-wrap">
+        <div class="cal-section">
+          <div class="block-label">日期</div>
+          <div class="cal-header">
+            <button class="cal-nav" id="prevMonth">&#8249;</button>
+            <div class="cal-title" id="calTitle"></div>
+            <button class="cal-nav" id="nextMonth">&#8250;</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
         </div>
-        <div class="cal-grid" id="calGrid"></div>
-      </div>
-      <div class="time-section">
-        <div class="block-label">時段</div>
-        <div class="time-grid">
-          <div class="time-slot" data-slot="10:00">10:00</div>
-          <div class="time-slot" data-slot="14:00">14:00</div>
-          <div class="time-slot" data-slot="18:00">18:00</div>
+        <div class="time-section">
+          <div class="block-label">時段</div>
+          <div class="time-grid">
+            <div class="time-slot" data-slot="10:00">10:00</div>
+            <div class="time-slot" data-slot="14:00">14:00</div>
+            <div class="time-slot" data-slot="18:00">18:00</div>
+          </div>
         </div>
       </div>
+      <button class="btn-primary" id="btn1" disabled>下一步 — 選擇服務</button>
     </div>
-    <button class="btn-primary" id="btn1" disabled>下一步 — 選擇服務</button>
-  </div>
-
-  <!-- Page 2: 服務 -->
-  <div id="page2" class="page">
-    <div class="section-title">選擇服務項目</div>
-    <div class="service-grid">
-      <div class="service-card" data-service="卸甲" data-price="200" data-dur="30 分鐘">
-        <div class="service-name">卸甲</div>
-        <div class="service-duration">30 分鐘</div>
-        <div class="service-price">NT$200</div>
+ 
+    <!-- Page 2 -->
+    <div id="page2" class="page">
+      <div class="section-title">選擇服務項目</div>
+      <div class="service-grid">
+        <div class="service-card" data-service="卸甲" data-price="200" data-dur="30 分鐘">
+          <div class="service-name">卸甲</div>
+          <div class="service-duration">30 分鐘</div>
+          <div class="service-price">NT$200</div>
+        </div>
+        <div class="service-card" data-service="單色" data-price="600" data-dur="60 分鐘">
+          <div class="service-name">單色</div>
+          <div class="service-duration">60 分鐘</div>
+          <div class="service-price">NT$600</div>
+        </div>
+        <div class="service-card" data-service="延甲" data-price="1200" data-dur="120 分鐘">
+          <div class="service-name">延甲</div>
+          <div class="service-duration">120 分鐘</div>
+          <div class="service-price">NT$1,200</div>
+        </div>
       </div>
-      <div class="service-card" data-service="單色" data-price="600" data-dur="60 分鐘">
-        <div class="service-name">單色</div>
-        <div class="service-duration">60 分鐘</div>
-        <div class="service-price">NT$600</div>
+      <button class="btn-primary" id="btn2" disabled>下一步 — 填寫資料</button>
+      <button class="btn-secondary" id="back1">返回上一步</button>
+    </div>
+ 
+    <!-- Page 3 -->
+    <div id="page3" class="page">
+      <div class="section-title">填寫個人資料</div>
+      <div class="form-group">
+        <label class="form-label">姓名</label>
+        <input class="form-input" type="text" placeholder="您的姓名" id="fName">
       </div>
-      <div class="service-card" data-service="延甲" data-price="1200" data-dur="120 分鐘">
-        <div class="service-name">延甲</div>
-        <div class="service-duration">120 分鐘</div>
-        <div class="service-price">NT$1,200</div>
+      <div class="form-group">
+        <label class="form-label">IG 帳號</label>
+        <input class="form-input" type="text" placeholder="@yourhandle" id="fIG">
       </div>
+      <div class="form-group">
+        <label class="form-label">電子郵件（選填）</label>
+        <input class="form-input" type="email" placeholder="your@email.com" id="fEmail">
+      </div>
+      <div class="form-group">
+        <label class="form-label">備註</label>
+        <textarea class="form-input" rows="3" placeholder="例如：想做的顏色、參考圖案等..." id="fNote" style="resize:none;"></textarea>
+      </div>
+      <button class="btn-primary" id="btn3">下一步 — 確認預約</button>
+      <button class="btn-secondary" id="back2">返回上一步</button>
     </div>
-    <button class="btn-primary" id="btn2" disabled>下一步 — 填寫資料</button>
-    <button class="btn-secondary" id="back1">返回上一步</button>
-  </div>
-
-  <!-- Page 3: 資訊 -->
-  <div id="page3" class="page">
-    <div class="section-title">填寫個人資料</div>
-    <div class="form-group">
-      <label class="form-label">姓名</label>
-      <input class="form-input" type="text" placeholder="您的姓名" id="fName">
+ 
+    <!-- Page 4 -->
+    <div id="page4" class="page">
+      <div class="section-title">確認預約資訊</div>
+      <div class="summary-card" id="summaryCard"></div>
+      <button class="btn-primary" id="btnConfirm">確認預約</button>
+      <button class="btn-secondary" id="back3">返回修改</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">IG 帳號</label>
-      <input class="form-input" type="text" placeholder="@yourhandle" id="fIG">
+ 
+    <!-- Success -->
+    <div class="success-screen" id="successPage">
+      <div class="success-icon">🌸</div>
+      <div class="success-title">預約成功！</div>
+      <div class="success-sub">感謝您預約 nyorong nail 嬉希工作室。<br>我們將盡快與您確認。</div>
+      <div class="booking-code" id="bookingCode"></div>
+      <button class="btn-primary" onclick="resetAll()">返回首頁</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">電子郵件（選填）</label>
-      <input class="form-input" type="email" placeholder="your@email.com" id="fEmail">
-    </div>
-    <div class="form-group">
-      <label class="form-label">備註</label>
-      <textarea class="form-input" rows="3" placeholder="例如：想做的顏色、參考圖案等..." id="fNote" style="resize:none;"></textarea>
-    </div>
-    <button class="btn-primary" id="btn3">下一步 — 確認預約</button>
-    <button class="btn-secondary" id="back2">返回上一步</button>
-  </div>
-
-  <!-- Page 4: 確認 -->
-  <div id="page4" class="page">
-    <div class="section-title">確認預約資訊</div>
-    <div class="summary-card" id="summaryCard"></div>
-    <button class="btn-primary" id="btnConfirm">確認預約</button>
-    <button class="btn-secondary" id="back3">返回修改</button>
-  </div>
-
-  <!-- Success -->
-  <div class="success-screen" id="successPage">
-    <div class="success-icon">🌸</div>
-    <div class="success-title">預約成功！</div>
-    <div class="success-sub">感謝您預約 nyorong nail 嬉希工作室。<br>我們將盡快與您確認。</div>
-    <div class="booking-code" id="bookingCode"></div>
-    <button class="btn-primary" onclick="resetAll()">返回首頁</button>
   </div>
 </div>
-
+ 
 <script>
-const state = {
-  date: null, slot: null, service: null, price: 0, dur: '',
-  name: '', ig: '', email: '', note: '',
-  calYear: new Date().getFullYear(), calMonth: new Date().getMonth()
-};
-const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
-const DAYS = ['一','二','三','四','五','六','日'];
-
-function checkPage1() {
-  document.getElementById('btn1').disabled = !(state.date && state.slot);
-}
-
-function showPage(n) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('successPage').style.display = 'none';
-  const pg = document.getElementById('page' + n);
-  if (pg) pg.classList.add('active');
-  updateSteps(n);
-}
-function updateSteps(n) {
-  document.querySelectorAll('.step').forEach(s => {
-    const sn = parseInt(s.dataset.step);
-    s.classList.remove('active','done');
-    if (sn === n) s.classList.add('active');
-    else if (sn < n) s.classList.add('done');
-  });
-}
-
-function renderCalendar() {
-  const { calYear, calMonth } = state;
-  document.getElementById('calTitle').textContent = calYear + ' 年 ' + MONTHS[calMonth];
-  const grid = document.getElementById('calGrid');
-  grid.innerHTML = '';
-  DAYS.forEach(d => { const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el); });
-  const first = new Date(calYear, calMonth, 1).getDay();
-  const days = new Date(calYear, calMonth+1, 0).getDate();
-  const today = new Date();
-  for (let i = 0; i < first; i++) { const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el); }
-  for (let d = 1; d <= days; d++) {
-    const el = document.createElement('div'); el.className = 'cal-day'; el.textContent = d;
-    const thisDate = new Date(calYear, calMonth, d);
-    const isPast = thisDate < new Date(today.toDateString());
-    const isSun = thisDate.getDay() === 0;
-    if (isPast || isSun) { el.classList.add('disabled'); }
-    else {
-      if (thisDate.toDateString() === today.toDateString()) el.classList.add('today');
-      if (state.date && state.date.toDateString() === thisDate.toDateString()) el.classList.add('selected');
-      el.addEventListener('click', () => {
-        state.date = thisDate;
-        renderCalendar();
-        checkPage1();
-      });
-    }
-    grid.appendChild(el);
+  const state = {
+    date: null, slot: null, service: null, price: 0, dur: '',
+    name: '', ig: '', email: '', note: '',
+    calYear: 2026, calMonth: 4  // 從 2026年5月開始（month index 4）
+  };
+ 
+  // 可預約日期：key = "YYYY-M"（月份 1-based）
+  const AVAILABLE = {
+    '2026-5': [9, 10, 16, 17, 23, 24, 30, 31],
+    '2026-6': []
+  };
+ 
+  const MIN_YEAR = 2026, MIN_MONTH = 4;  // 5月
+  const MAX_YEAR = 2026, MAX_MONTH = 5;  // 6月
+ 
+  const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  // 星期一到日
+  const DAYS_DISPLAY = ['一','二','三','四','五','六','日'];
+ 
+  function isAvailable(year, month, day) {
+    const key = year + '-' + (month + 1);
+    const list = AVAILABLE[key];
+    return list && list.includes(day);
   }
-}
-
-document.getElementById('prevMonth').addEventListener('click', () => {
-  state.calMonth--; if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; } renderCalendar();
-});
-document.getElementById('nextMonth').addEventListener('click', () => {
-  state.calMonth++; if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; } renderCalendar();
-});
-
-document.querySelectorAll('.time-slot').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
-    el.classList.add('selected');
-    state.slot = el.dataset.slot;
-    checkPage1();
+ 
+  function checkPage1() {
+    document.getElementById('btn1').disabled = !(state.date && state.slot);
+  }
+ 
+  function showPage(n) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('successPage').style.display = 'none';
+    const pg = document.getElementById('page' + n);
+    if (pg) pg.classList.add('active');
+    updateSteps(n);
+  }
+ 
+  function updateSteps(n) {
+    document.querySelectorAll('.step').forEach(s => {
+      const sn = parseInt(s.dataset.step);
+      s.classList.remove('active','done');
+      if (sn === n) s.classList.add('active');
+      else if (sn < n) s.classList.add('done');
+    });
+  }
+ 
+  function renderCalendar() {
+    const { calYear, calMonth } = state;
+    document.getElementById('calTitle').textContent = calYear + ' 年 ' + MONTHS[calMonth];
+ 
+    const prevBtn = document.getElementById('prevMonth');
+    const nextBtn = document.getElementById('nextMonth');
+    prevBtn.disabled = (calYear === MIN_YEAR && calMonth === MIN_MONTH);
+    nextBtn.disabled = (calYear === MAX_YEAR && calMonth === MAX_MONTH);
+ 
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+ 
+    // 欄位標題（一～日），六日紅色
+    DAYS_DISPLAY.forEach((d, i) => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      if (i >= 5) el.classList.add('weekend'); // index 5=六, 6=日
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+ 
+    const firstJsDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+    // 轉為星期一為首的 offset：Mon→0, Tue→1, ... Sun→6
+    const offset = (firstJsDay === 0) ? 6 : firstJsDay - 1;
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+ 
+    for (let i = 0; i < offset; i++) {
+      const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el);
+    }
+ 
+    for (let d = 1; d <= daysInMonth; d++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day';
+      el.textContent = d;
+ 
+      const thisDate = new Date(calYear, calMonth, d);
+      const jsDay = thisDate.getDay(); // 0=Sun, 6=Sat
+      const isSat = jsDay === 6;
+      const isSun = jsDay === 0;
+ 
+      if (isSat || isSun) el.classList.add('weekend');
+ 
+      const available = isAvailable(calYear, calMonth, d);
+ 
+      if (available) {
+        el.classList.add('available');
+        if (state.date && state.date.toDateString() === thisDate.toDateString()) {
+          el.classList.add('selected');
+        }
+        el.addEventListener('click', () => {
+          state.date = thisDate;
+          renderCalendar();
+          checkPage1();
+        });
+      } else {
+        el.classList.add('disabled');
+      }
+ 
+      grid.appendChild(el);
+    }
+  }
+ 
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    if (state.calYear === MIN_YEAR && state.calMonth === MIN_MONTH) return;
+    state.calMonth--;
+    if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+    renderCalendar();
   });
-});
-
-document.getElementById('btn1').addEventListener('click', () => { if (state.date && state.slot) showPage(2); });
-document.getElementById('back1').addEventListener('click', () => showPage(1));
-document.getElementById('back2').addEventListener('click', () => showPage(2));
-document.getElementById('back3').addEventListener('click', () => showPage(3));
-
-document.querySelectorAll('.service-card').forEach(c => {
-  c.addEventListener('click', () => {
-    document.querySelectorAll('.service-card').forEach(x => x.classList.remove('selected'));
-    c.classList.add('selected');
-    state.service = c.dataset.service;
-    state.price = parseInt(c.dataset.price);
-    state.dur = c.dataset.dur;
-    document.getElementById('btn2').disabled = false;
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    if (state.calYear === MAX_YEAR && state.calMonth === MAX_MONTH) return;
+    state.calMonth++;
+    if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+    renderCalendar();
   });
-});
-document.getElementById('btn2').addEventListener('click', () => { if (state.service) showPage(3); });
-
-document.getElementById('btn3').addEventListener('click', () => {
-  const n = document.getElementById('fName').value.trim();
-  const ig = document.getElementById('fIG').value.trim();
-  if (!n || !ig) { alert('請填寫姓名與 IG 帳號'); return; }
-  state.name = n; state.ig = ig;
-  state.email = document.getElementById('fEmail').value;
-  state.note = document.getElementById('fNote').value;
-  renderSummary(); showPage(4);
-});
-
-function renderSummary() {
-  const d = state.date;
-  const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
-  const rows = [
-    ['預約日期', dateStr],
-    ['預約時段', state.slot],
-    ['服務項目', state.service],
-    ['服務時長', state.dur],
-    ['姓名', state.name],
-    ['IG 帳號', state.ig],
-    ...(state.email ? [['電子郵件', state.email]] : []),
-    ...(state.note ? [['備註', state.note]] : []),
-    ['費用', 'NT$' + state.price.toLocaleString()],
-  ];
-  document.getElementById('summaryCard').innerHTML = rows.map((r, i) =>
-    `<div class="summary-row"><span class="summary-label">${r[0]}</span><span class="summary-value${i===rows.length-1?' price':''}">${r[1]}</span></div>`
-  ).join('');
-}
-
-document.getElementById('btnConfirm').addEventListener('click', () => {
-  const code = 'NY-' + Math.random().toString(36).substr(2,6).toUpperCase();
-  document.getElementById('bookingCode').textContent = code;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('successPage').style.display = 'block';
-  updateSteps(5);
-});
-
-function resetAll() {
-  state.date = null; state.slot = null; state.service = null; state.price = 0; state.dur = '';
-  state.name = ''; state.ig = ''; state.email = ''; state.note = '';
-  state.calYear = new Date().getFullYear(); state.calMonth = new Date().getMonth();
-  document.querySelectorAll('.time-slot, .service-card').forEach(c => c.classList.remove('selected'));
-  ['fName','fIG','fEmail','fNote'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('btn2').disabled = true;
-  showPage(1);
-}
-
-renderCalendar();
+ 
+  document.querySelectorAll('.time-slot').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+      state.slot = el.dataset.slot;
+      checkPage1();
+    });
+  });
+ 
+  document.getElementById('btn1').addEventListener('click', () => { if (state.date && state.slot) showPage(2); });
+  document.getElementById('back1').addEventListener('click', () => showPage(1));
+  document.getElementById('back2').addEventListener('click', () => showPage(2));
+  document.getElementById('back3').addEventListener('click', () => showPage(3));
+ 
+  document.querySelectorAll('.service-card').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.service-card').forEach(x => x.classList.remove('selected'));
+      c.classList.add('selected');
+      state.service = c.dataset.service;
+      state.price = parseInt(c.dataset.price);
+      state.dur = c.dataset.dur;
+      document.getElementById('btn2').disabled = false;
+    });
+  });
+  document.getElementById('btn2').addEventListener('click', () => { if (state.service) showPage(3); });
+ 
+  document.getElementById('btn3').addEventListener('click', () => {
+    const n = document.getElementById('fName').value.trim();
+    const ig = document.getElementById('fIG').value.trim();
+    if (!n || !ig) { alert('請填寫姓名與 IG 帳號'); return; }
+    state.name = n; state.ig = ig;
+    state.email = document.getElementById('fEmail').value;
+    state.note = document.getElementById('fNote').value;
+    renderSummary(); showPage(4);
+  });
+ 
+  function renderSummary() {
+    const d = state.date;
+    const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
+    const rows = [
+      ['預約日期', dateStr],
+      ['預約時段', state.slot],
+      ['服務項目', state.service],
+      ['服務時長', state.dur],
+      ['姓名', state.name],
+      ['IG 帳號', state.ig],
+      ...(state.email ? [['電子郵件', state.email]] : []),
+      ...(state.note ? [['備註', state.note]] : []),
+      ['費用', 'NT$' + state.price.toLocaleString()],
+    ];
+    document.getElementById('summaryCard').innerHTML = rows.map((r, i) =>
+      `<div class="summary-row"><span class="summary-label">${r[0]}</span><span class="summary-value${i===rows.length-1?' price':''}">${r[1]}</span></div>`
+    ).join('');
+  }
+ 
+  document.getElementById('btnConfirm').addEventListener('click', () => {
+    const code = 'NY-' + Math.random().toString(36).substr(2,6).toUpperCase();
+    document.getElementById('bookingCode').textContent = code;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('successPage').style.display = 'block';
+    updateSteps(5);
+  });
+ 
+  function resetAll() {
+    state.date = null; state.slot = null; state.service = null; state.price = 0; state.dur = '';
+    state.name = ''; state.ig = ''; state.email = ''; state.note = '';
+    state.calYear = 2026; state.calMonth = 4;
+    document.querySelectorAll('.time-slot, .service-card').forEach(c => c.classList.remove('selected'));
+    ['fName','fIG','fEmail','fNote'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('btn2').disabled = true;
+    showPage(1);
+  }
+ 
+  renderCalendar();
 </script>
+</body>
+</html>
+ 
