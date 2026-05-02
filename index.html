@@ -10,11 +10,11 @@
     body { background: #faf9fc; color: #2a2a2a; font-family: 'Jost', sans-serif; font-weight: 300; }
     .app { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; min-height: 100vh; }
     .inner { max-width: 480px; margin: 0 auto; }
- 
+
     .brand { text-align: center; margin-bottom: 2rem; }
     .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: 0.1em; color: #2a2a2a; }
     .brand-sub { font-size: 11px; letter-spacing: 0.28em; color: #aaa; text-transform: uppercase; margin-top: 4px; }
- 
+
     .step-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; }
     .step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaa; background: #fff; transition: all 0.25s; }
@@ -23,14 +23,14 @@
     .step-label { font-size: 10px; letter-spacing: 0.12em; color: #aaa; }
     .step.active .step-label { color: #B0A0C8; }
     .step-line { flex: 1; height: 1px; background: #e5e5e5; max-width: 60px; margin-bottom: 18px; }
- 
+
     .section-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 1.25rem; color: #2a2a2a; }
- 
+
     .datetime-wrap { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 2rem; background: #fff; }
     .cal-section { padding: 1.25rem; border-bottom: 0.5px solid #e0dce8; }
     .time-section { padding: 1.25rem; }
     .block-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; }
- 
+
     .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .cal-title { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; }
     .cal-nav { background: none; border: 0.5px solid #e0dce8; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -46,12 +46,12 @@
     .cal-day.selected { background: #B0A0C8 !important; color: #fff !important; cursor: pointer; }
     .cal-day.disabled { color: #ccc !important; opacity: 0.35; }
     .cal-day.empty { }
- 
+
     .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .time-slot { border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
     .time-slot:hover { border-color: #B0A0C8; color: #9070B8; }
     .time-slot.selected { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
- 
+
     /* Service blocks */
     .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
     .svc-block-header { padding: 12px 16px; background: #f5f0fa; display: flex; align-items: center; justify-content: space-between; }
@@ -67,31 +67,31 @@
     .sub-item.addon { background: #fdfbff; }
     .sub-item.addon.selected { border: 1.5px solid #c8b8e0; background: #f0eafa; }
     .sub-item.addon .sub-item-price { color: #b090d0; }
- 
+
     .form-group { margin-bottom: 1rem; }
     .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
     .form-input { width: 100%; border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
     .form-input:focus { outline: none; border-color: #B0A0C8; }
- 
+
     .summary-card { border: 0.5px solid #B0A0C8; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; background: #f5f0fa; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #e0dce8; }
     .summary-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; margin-top: 4px; }
     .summary-label { color: #666; }
     .summary-value { color: #2a2a2a; }
     .summary-value.price { color: #9070B8; }
- 
+
     .btn-primary { width: 100%; background: #B0A0C8; border: none; border-radius: 8px; padding: 14px; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; cursor: pointer; font-family: 'Jost', sans-serif; transition: background 0.2s; margin-bottom: 0.75rem; }
     .btn-primary:hover:not(:disabled) { background: #9070B8; }
     .btn-primary:disabled { opacity: 0.4; cursor: default; }
     .btn-secondary { width: 100%; background: none; border: 0.5px solid #ccc; border-radius: 8px; padding: 12px; font-size: 12px; letter-spacing: 0.1em; color: #666; cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.2s; }
     .btn-secondary:hover { border-color: #B0A0C8; color: #B0A0C8; }
- 
+
     .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
     .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #ede8f5; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 28px; }
     .success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
     .success-sub { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 2rem; }
     .booking-code { display: inline-block; border: 0.5px solid #B0A0C8; border-radius: 8px; padding: 8px 20px; font-size: 18px; letter-spacing: 0.25em; color: #9070B8; margin-bottom: 2rem; }
- 
+
     .page { display: none; }
     .page.active { display: block; }
   </style>
@@ -103,7 +103,7 @@
       <div class="brand-name">nyorong nail 嬉希工作室</div>
       <div class="brand-sub">線上預約系統</div>
     </div>
- 
+
     <div class="step-bar" id="stepBar">
       <div class="step active" data-step="1"><div class="step-dot">1</div><div class="step-label">日期</div></div>
       <div class="step-line"></div>
@@ -113,7 +113,7 @@
       <div class="step-line"></div>
       <div class="step" data-step="4"><div class="step-dot">4</div><div class="step-label">確認</div></div>
     </div>
- 
+
     <!-- Page 1 -->
     <div id="page1" class="page active">
       <div class="section-title">選擇日期與時段</div>
@@ -138,11 +138,11 @@
       </div>
       <button class="btn-primary" id="btn1" disabled>下一步 — 選擇服務</button>
     </div>
- 
+
     <!-- Page 2 -->
     <div id="page2" class="page">
       <div class="section-title">選擇服務項目</div>
- 
+
       <!-- 卸甲 -->
       <div class="svc-block">
         <div class="svc-block-header">
@@ -151,7 +151,7 @@
         </div>
         <div class="svc-block-body" id="body-卸甲"></div>
       </div>
- 
+
       <!-- 凝膠 -->
       <div class="svc-block">
         <div class="svc-block-header">
@@ -160,7 +160,7 @@
         </div>
         <div class="svc-block-body" id="body-凝膠"></div>
       </div>
- 
+
       <!-- 造型 -->
       <div class="svc-block" style="margin-bottom:2rem;">
         <div class="svc-block-header">
@@ -169,11 +169,11 @@
         </div>
         <div class="svc-block-body" id="body-造型"></div>
       </div>
- 
+
       <button class="btn-primary" id="btn2" disabled>下一步 — 填寫資料</button>
       <button class="btn-secondary" id="back1">返回上一步</button>
     </div>
- 
+
     <!-- Page 3 -->
     <div id="page3" class="page">
       <div class="section-title">填寫個人資料</div>
@@ -196,7 +196,7 @@
       <button class="btn-primary" id="btn3">下一步 — 確認預約</button>
       <button class="btn-secondary" id="back2">返回上一步</button>
     </div>
- 
+
     <!-- Page 4 -->
     <div id="page4" class="page">
       <div class="section-title">確認預約資訊</div>
@@ -204,7 +204,7 @@
       <button class="btn-primary" id="btnConfirm">確認預約</button>
       <button class="btn-secondary" id="back3">返回修改</button>
     </div>
- 
+
     <!-- Success -->
     <div class="success-screen" id="successPage">
       <div class="success-icon">🌸</div>
@@ -215,37 +215,37 @@
     </div>
   </div>
 </div>
- 
+
 <script>
   const state = {
     date: null, slot: null, service: null, price: 0, dur: '',
     name: '', ig: '', email: '', note: '',
     calYear: 2026, calMonth: 4  // 從 2026年5月開始（month index 4）
   };
- 
+
   // 可預約日期：key = "YYYY-M"（月份 1-based）
   const AVAILABLE = {
     '2026-5': [9, 10, 16, 17, 23, 24, 30, 31],
     '2026-6': []
   };
- 
+
   const MIN_YEAR = 2026, MIN_MONTH = 4;  // 5月
   const MAX_YEAR = 2026, MAX_MONTH = 5;  // 6月
- 
+
   const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
   // 星期一到日
   const DAYS_DISPLAY = ['一','二','三','四','五','六','日'];
- 
+
   function isAvailable(year, month, day) {
     const key = year + '-' + (month + 1);
     const list = AVAILABLE[key];
     return list && list.includes(day);
   }
- 
+
   function checkPage1() {
     document.getElementById('btn1').disabled = !(state.date && state.slot);
   }
- 
+
   function showPage(n) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('successPage').style.display = 'none';
@@ -253,7 +253,7 @@
     if (pg) pg.classList.add('active');
     updateSteps(n);
   }
- 
+
   function updateSteps(n) {
     document.querySelectorAll('.step').forEach(s => {
       const sn = parseInt(s.dataset.step);
@@ -262,19 +262,19 @@
       else if (sn < n) s.classList.add('done');
     });
   }
- 
+
   function renderCalendar() {
     const { calYear, calMonth } = state;
     document.getElementById('calTitle').textContent = calYear + ' 年 ' + MONTHS[calMonth];
- 
+
     const prevBtn = document.getElementById('prevMonth');
     const nextBtn = document.getElementById('nextMonth');
     prevBtn.disabled = (calYear === MIN_YEAR && calMonth === MIN_MONTH);
     nextBtn.disabled = (calYear === MAX_YEAR && calMonth === MAX_MONTH);
- 
+
     const grid = document.getElementById('calGrid');
     grid.innerHTML = '';
- 
+
     // 欄位標題（一～日），六日紅色
     DAYS_DISPLAY.forEach((d, i) => {
       const el = document.createElement('div');
@@ -283,30 +283,30 @@
       el.textContent = d;
       grid.appendChild(el);
     });
- 
+
     const firstJsDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
     // 轉為星期一為首的 offset：Mon→0, Tue→1, ... Sun→6
     const offset = (firstJsDay === 0) ? 6 : firstJsDay - 1;
     const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
- 
+
     for (let i = 0; i < offset; i++) {
       const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el);
     }
- 
+
     for (let d = 1; d <= daysInMonth; d++) {
       const el = document.createElement('div');
       el.className = 'cal-day';
       el.textContent = d;
- 
+
       const thisDate = new Date(calYear, calMonth, d);
       const jsDay = thisDate.getDay(); // 0=Sun, 6=Sat
       const isSat = jsDay === 6;
       const isSun = jsDay === 0;
- 
+
       if (isSat || isSun) el.classList.add('weekend');
- 
+
       const available = isAvailable(calYear, calMonth, d);
- 
+
       if (available) {
         el.classList.add('available');
         if (state.date && state.date.toDateString() === thisDate.toDateString()) {
@@ -320,11 +320,11 @@
       } else {
         el.classList.add('disabled');
       }
- 
+
       grid.appendChild(el);
     }
   }
- 
+
   document.getElementById('prevMonth').addEventListener('click', () => {
     if (state.calYear === MIN_YEAR && state.calMonth === MIN_MONTH) return;
     state.calMonth--;
@@ -337,7 +337,7 @@
     if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
     renderCalendar();
   });
- 
+
   document.querySelectorAll('.time-slot').forEach(el => {
     el.addEventListener('click', () => {
       document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
@@ -346,12 +346,12 @@
       checkPage1();
     });
   });
- 
+
   document.getElementById('btn1').addEventListener('click', () => { if (state.date && state.slot) showPage(2); });
   document.getElementById('back1').addEventListener('click', () => showPage(1));
   document.getElementById('back2').addEventListener('click', () => showPage(2));
   document.getElementById('back3').addEventListener('click', () => showPage(3));
- 
+
   // ── Service data ──────────────────────────────────────────────
   const SERVICES = {
     '卸甲': {
@@ -385,25 +385,25 @@
       addons: []
     }
   };
- 
+
   // state for page 2
   const svcState = {
     '卸甲': { item: null, addon: null },
     '凝膠': { item: null, addon: null },
     '造型': { item: null, addon: null },
   };
- 
+
   function checkPage2() {
     const allSelected = ['卸甲','凝膠','造型'].every(cat => svcState[cat].item !== null);
     document.getElementById('btn2').disabled = !allSelected;
   }
- 
+
   function renderBlock(cat) {
     const body = document.getElementById('body-' + cat);
     const selEl = document.getElementById('sel-' + cat);
     const data = SERVICES[cat];
     body.innerHTML = '';
- 
+
     // Main items
     data.items.forEach(item => {
       const el = document.createElement('div');
@@ -421,7 +421,7 @@
       });
       body.appendChild(el);
     });
- 
+
     // Addons
     if (data.addons.length > 0) {
       const lbl = document.createElement('div');
@@ -442,7 +442,7 @@
         body.appendChild(el);
       });
     }
- 
+
     // Update header label
     if (svcState[cat].item) {
       const addonText = svcState[cat].addon ? `＋${svcState[cat].addon}` : '';
@@ -451,11 +451,11 @@
       selEl.textContent = '請選擇';
     }
   }
- 
+
   function initBlocks() {
     ['卸甲','凝膠','造型'].forEach(cat => renderBlock(cat));
   }
- 
+
   function getTotalPrice() {
     let total = 0;
     ['卸甲','凝膠','造型'].forEach(cat => {
@@ -464,7 +464,7 @@
     });
     return total;
   }
- 
+
   function getServiceSummary() {
     return ['卸甲','凝膠','造型'].map(cat => {
       let txt = cat + '：' + svcState[cat].item;
@@ -472,13 +472,13 @@
       return txt;
     }).join('　');
   }
- 
+
   initBlocks();
- 
+
   document.getElementById('btn2').addEventListener('click', () => {
     if (['卸甲','凝膠','造型'].every(cat => svcState[cat].item !== null)) showPage(3);
   });
- 
+
   document.getElementById('btn3').addEventListener('click', () => {
     const n = document.getElementById('fName').value.trim();
     const ig = document.getElementById('fIG').value.trim();
@@ -488,11 +488,11 @@
     state.note = document.getElementById('fNote').value;
     renderSummary(); showPage(4);
   });
- 
+
   function renderSummary() {
     const d = state.date;
     const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
- 
+
     const cats = ['卸甲','凝膠','造型'];
     const serviceRows = cats.map(cat => {
       let label = cat;
@@ -500,9 +500,9 @@
       if (svcState[cat].addon) val += '　＋' + svcState[cat].addon;
       return [label, val];
     });
- 
+
     const total = getTotalPrice();
- 
+
     const rows = [
       ['預約日期', dateStr],
       ['預約時段', state.slot],
@@ -517,15 +517,56 @@
       `<div class="summary-row"><span class="summary-label">${r[0]}</span><span class="summary-value${i===rows.length-1?' price':''}">${r[1]}</span></div>`
     ).join('');
   }
- 
-  document.getElementById('btnConfirm').addEventListener('click', () => {
-    const code = 'NY-' + Math.random().toString(36).substr(2,6).toUpperCase();
-    document.getElementById('bookingCode').textContent = code;
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('successPage').style.display = 'block';
-    updateSteps(5);
+
+  // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
+  const GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+  document.getElementById('btnConfirm').addEventListener('click', async () => {
+    const btn = document.getElementById('btnConfirm');
+    btn.disabled = true;
+    btn.textContent = '送出中…';
+
+    const d = state.date;
+    const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
+
+    const payload = {
+      date:         dateStr,
+      slot:         state.slot,
+      removal:      svcState['卸甲'].item,
+      removalAddon: svcState['卸甲'].addon || '',
+      gel:          svcState['凝膠'].item,
+      gelAddon:     svcState['凝膠'].addon || '',
+      design:       svcState['造型'].item,
+      name:         state.name,
+      ig:           state.ig,
+      email:        state.email || '',
+      note:         state.note  || '',
+    };
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        document.getElementById('bookingCode').textContent = result.bookingCode;
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('successPage').style.display = 'block';
+        updateSteps(5);
+      } else {
+        alert('送出失敗，請稍後再試。\n（' + (result.error || '未知錯誤') + '）');
+        btn.disabled = false;
+        btn.textContent = '確認預約';
+      }
+    } catch (err) {
+      alert('網路錯誤，請確認連線後再試。');
+      btn.disabled = false;
+      btn.textContent = '確認預約';
+    }
   });
- 
+
   function resetAll() {
     state.date = null; state.slot = null; state.service = null; state.price = 0; state.dur = '';
     state.name = ''; state.ig = ''; state.email = ''; state.note = '';
@@ -537,9 +578,8 @@
     document.getElementById('btn2').disabled = true;
     showPage(1);
   }
- 
+
   renderCalendar();
 </script>
 </body>
 </html>
- 
