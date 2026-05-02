@@ -52,13 +52,21 @@
     .time-slot:hover { border-color: #B0A0C8; color: #9070B8; }
     .time-slot.selected { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
  
-    .service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
-    .service-card { border: 0.5px solid #e0dce8; border-radius: 12px; padding: 1.25rem 0.75rem; cursor: pointer; transition: all 0.2s; text-align: center; background: #fff; }
-    .service-card:hover { border-color: #B0A0C8; }
-    .service-card.selected { border: 1.5px solid #B0A0C8; background: #f5f0fa; }
-    .service-name { font-size: 15px; font-weight: 500; color: #2a2a2a; margin-bottom: 6px; }
-    .service-duration { font-size: 11px; color: #aaa; letter-spacing: 0.06em; margin-bottom: 8px; }
-    .service-price { font-size: 14px; color: #9070B8; font-weight: 500; }
+    /* Service blocks */
+    .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
+    .svc-block-header { padding: 12px 16px; background: #f5f0fa; display: flex; align-items: center; justify-content: space-between; }
+    .svc-block-title { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; color: #9070B8; text-transform: uppercase; }
+    .svc-block-selected { font-size: 12px; color: #B0A0C8; }
+    .svc-block-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .sub-item { display: flex; align-items: center; justify-content: space-between; border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; background: #fff; }
+    .sub-item:hover { border-color: #B0A0C8; }
+    .sub-item.selected { border: 1.5px solid #B0A0C8; background: #f5f0fa; }
+    .sub-item-name { font-size: 13px; color: #2a2a2a; }
+    .sub-item-price { font-size: 13px; color: #9070B8; font-weight: 500; }
+    .addon-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #aaa; padding: 8px 14px 4px; }
+    .sub-item.addon { background: #fdfbff; }
+    .sub-item.addon.selected { border: 1.5px solid #c8b8e0; background: #f0eafa; }
+    .sub-item.addon .sub-item-price { color: #b090d0; }
  
     .form-group { margin-bottom: 1rem; }
     .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
@@ -134,23 +142,34 @@
     <!-- Page 2 -->
     <div id="page2" class="page">
       <div class="section-title">選擇服務項目</div>
-      <div class="service-grid">
-        <div class="service-card" data-service="卸甲" data-price="200" data-dur="30 分鐘">
-          <div class="service-name">卸甲</div>
-          <div class="service-duration">30 分鐘</div>
-          <div class="service-price">NT$200</div>
+ 
+      <!-- 卸甲 -->
+      <div class="svc-block">
+        <div class="svc-block-header">
+          <span class="svc-block-title">卸甲</span>
+          <span class="svc-block-selected" id="sel-卸甲">請選擇</span>
         </div>
-        <div class="service-card" data-service="單色" data-price="600" data-dur="60 分鐘">
-          <div class="service-name">單色</div>
-          <div class="service-duration">60 分鐘</div>
-          <div class="service-price">NT$600</div>
-        </div>
-        <div class="service-card" data-service="延甲" data-price="1200" data-dur="120 分鐘">
-          <div class="service-name">延甲</div>
-          <div class="service-duration">120 分鐘</div>
-          <div class="service-price">NT$1,200</div>
-        </div>
+        <div class="svc-block-body" id="body-卸甲"></div>
       </div>
+ 
+      <!-- 凝膠 -->
+      <div class="svc-block">
+        <div class="svc-block-header">
+          <span class="svc-block-title">凝膠</span>
+          <span class="svc-block-selected" id="sel-凝膠">請選擇</span>
+        </div>
+        <div class="svc-block-body" id="body-凝膠"></div>
+      </div>
+ 
+      <!-- 造型 -->
+      <div class="svc-block" style="margin-bottom:2rem;">
+        <div class="svc-block-header">
+          <span class="svc-block-title">造型</span>
+          <span class="svc-block-selected" id="sel-造型">請選擇</span>
+        </div>
+        <div class="svc-block-body" id="body-造型"></div>
+      </div>
+ 
       <button class="btn-primary" id="btn2" disabled>下一步 — 填寫資料</button>
       <button class="btn-secondary" id="back1">返回上一步</button>
     </div>
@@ -333,17 +352,132 @@
   document.getElementById('back2').addEventListener('click', () => showPage(2));
   document.getElementById('back3').addEventListener('click', () => showPage(3));
  
-  document.querySelectorAll('.service-card').forEach(c => {
-    c.addEventListener('click', () => {
-      document.querySelectorAll('.service-card').forEach(x => x.classList.remove('selected'));
-      c.classList.add('selected');
-      state.service = c.dataset.service;
-      state.price = parseInt(c.dataset.price);
-      state.dur = c.dataset.dur;
-      document.getElementById('btn2').disabled = false;
+  // ── Service data ──────────────────────────────────────────────
+  const SERVICES = {
+    '卸甲': {
+      items: [
+        { name: '不需卸甲', price: 0 },
+        { name: '本店續作', price: 200 },
+        { name: '他店續作', price: 300 },
+        { name: '指甲油（含透明硬甲油）', price: 50 },
+        { name: '本店純卸甲', price: 400 },
+      ],
+      addons: [
+        { name: '硬繭＆指緣護理', price: 100 }
+      ]
+    },
+    '凝膠': {
+      items: [
+        { name: '單色', price: 600 },
+        { name: '貓眼', price: 700 },
+        { name: '鏡面', price: 800 },
+      ],
+      addons: [
+        { name: '跳一色', price: 100 }
+      ]
+    },
+    '造型': {
+      items: [
+        { name: '立體造型', price: '$10–$80' },
+        { name: '手繪設計', price: '$20–$80' },
+        { name: '無需造型', price: 0 },
+      ],
+      addons: []
+    }
+  };
+ 
+  // state for page 2
+  const svcState = {
+    '卸甲': { item: null, addon: null },
+    '凝膠': { item: null, addon: null },
+    '造型': { item: null, addon: null },
+  };
+ 
+  function checkPage2() {
+    const allSelected = ['卸甲','凝膠','造型'].every(cat => svcState[cat].item !== null);
+    document.getElementById('btn2').disabled = !allSelected;
+  }
+ 
+  function renderBlock(cat) {
+    const body = document.getElementById('body-' + cat);
+    const selEl = document.getElementById('sel-' + cat);
+    const data = SERVICES[cat];
+    body.innerHTML = '';
+ 
+    // Main items
+    data.items.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'sub-item';
+      if (svcState[cat].item === item.name) el.classList.add('selected');
+      const priceStr = typeof item.price === 'number'
+        ? (item.price === 0 ? 'NT$0' : 'NT$' + item.price.toLocaleString())
+        : 'NT' + item.price;
+      el.innerHTML = `<span class="sub-item-name">${item.name}</span><span class="sub-item-price">${priceStr}</span>`;
+      el.addEventListener('click', () => {
+        svcState[cat].item = item.name;
+        svcState[cat].itemPrice = typeof item.price === 'number' ? item.price : null;
+        renderBlock(cat);
+        checkPage2();
+      });
+      body.appendChild(el);
     });
+ 
+    // Addons
+    if (data.addons.length > 0) {
+      const lbl = document.createElement('div');
+      lbl.className = 'addon-label';
+      lbl.textContent = '加購項目';
+      body.appendChild(lbl);
+      data.addons.forEach(addon => {
+        const el = document.createElement('div');
+        el.className = 'sub-item addon';
+        if (svcState[cat].addon === addon.name) el.classList.add('selected');
+        el.innerHTML = `<span class="sub-item-name">${addon.name}</span><span class="sub-item-price">+NT$${addon.price.toLocaleString()}</span>`;
+        el.addEventListener('click', () => {
+          // toggle
+          svcState[cat].addon = (svcState[cat].addon === addon.name) ? null : addon.name;
+          svcState[cat].addonPrice = (svcState[cat].addon) ? addon.price : 0;
+          renderBlock(cat);
+        });
+        body.appendChild(el);
+      });
+    }
+ 
+    // Update header label
+    if (svcState[cat].item) {
+      const addonText = svcState[cat].addon ? `＋${svcState[cat].addon}` : '';
+      selEl.textContent = svcState[cat].item + addonText;
+    } else {
+      selEl.textContent = '請選擇';
+    }
+  }
+ 
+  function initBlocks() {
+    ['卸甲','凝膠','造型'].forEach(cat => renderBlock(cat));
+  }
+ 
+  function getTotalPrice() {
+    let total = 0;
+    ['卸甲','凝膠','造型'].forEach(cat => {
+      total += svcState[cat].itemPrice || 0;
+      total += svcState[cat].addonPrice || 0;
+    });
+    return total;
+  }
+ 
+  function getServiceSummary() {
+    return ['卸甲','凝膠','造型'].map(cat => {
+      let txt = cat + '：' + svcState[cat].item;
+      if (svcState[cat].addon) txt += '＋' + svcState[cat].addon;
+      return txt;
+    }).join('　');
+  }
+ 
+  initBlocks();
+ 
+  document.getElementById('btn2').addEventListener('click', () => {
+    if (['卸甲','凝膠','造型'].every(cat => svcState[cat].item !== null)) showPage(3);
   });
-  document.getElementById('btn2').addEventListener('click', () => { if (state.service) showPage(3); });
  
   document.getElementById('btn3').addEventListener('click', () => {
     const n = document.getElementById('fName').value.trim();
@@ -358,16 +492,26 @@
   function renderSummary() {
     const d = state.date;
     const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
+ 
+    const cats = ['卸甲','凝膠','造型'];
+    const serviceRows = cats.map(cat => {
+      let label = cat;
+      let val = svcState[cat].item;
+      if (svcState[cat].addon) val += '　＋' + svcState[cat].addon;
+      return [label, val];
+    });
+ 
+    const total = getTotalPrice();
+ 
     const rows = [
       ['預約日期', dateStr],
       ['預約時段', state.slot],
-      ['服務項目', state.service],
-      ['服務時長', state.dur],
+      ...serviceRows,
       ['姓名', state.name],
       ['IG 帳號', state.ig],
       ...(state.email ? [['電子郵件', state.email]] : []),
       ...(state.note ? [['備註', state.note]] : []),
-      ['費用', 'NT$' + state.price.toLocaleString()],
+      ['合計費用', 'NT$' + total.toLocaleString() + (cats.some(c => svcState[c].item === '立體造型' || svcState[c].item === '手繪設計') ? '（造型費用依設計確認）' : '')],
     ];
     document.getElementById('summaryCard').innerHTML = rows.map((r, i) =>
       `<div class="summary-row"><span class="summary-label">${r[0]}</span><span class="summary-value${i===rows.length-1?' price':''}">${r[1]}</span></div>`
@@ -386,7 +530,9 @@
     state.date = null; state.slot = null; state.service = null; state.price = 0; state.dur = '';
     state.name = ''; state.ig = ''; state.email = ''; state.note = '';
     state.calYear = 2026; state.calMonth = 4;
-    document.querySelectorAll('.time-slot, .service-card').forEach(c => c.classList.remove('selected'));
+    ['卸甲','凝膠','造型'].forEach(cat => { svcState[cat] = { item: null, addon: null, itemPrice: 0, addonPrice: 0 }; });
+    document.querySelectorAll('.time-slot').forEach(c => c.classList.remove('selected'));
+    initBlocks();
     ['fName','fIG','fEmail','fNote'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('btn2').disabled = true;
     showPage(1);
