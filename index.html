@@ -55,7 +55,7 @@
     .time-slot.booked:hover { border-color: #e8e8e8; color: #ccc; }
 
     /* Service blocks */
-    .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
+  .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
     .svc-block-header { padding: 12px 16px; background: #f5f0fa; display: flex; align-items: center; justify-content: space-between; }
     .svc-block-title { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; color: #9070B8; text-transform: uppercase; }
     .svc-block-selected { font-size: 12px; color: #B0A0C8; }
@@ -74,7 +74,7 @@
     .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
     .form-input { width: 100%; border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
     .form-input:focus { outline: none; border-color: #B0A0C8; }
-
+ 
     .summary-card { border: 0.5px solid #B0A0C8; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; background: #f5f0fa; }
     .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #e0dce8; }
     .summary-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; margin-top: 4px; }
@@ -89,11 +89,24 @@
     .btn-secondary:hover { border-color: #B0A0C8; color: #B0A0C8; }
 
     .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
+    .form-notice { font-size: 11px; color: #aaa; letter-spacing: 0.04em; line-height: 1.7; margin-bottom:1.25rem; padding: 10px 14px; background: #f5f0fa; border-radius: 8px; border-left: 2px solid #B0A0C8;}
+    .terms-card { border: 0.5px solid #e0dce8; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; background: #fdfbff; }
+    .terms-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #B0A0C8; margin-bottom: 1rem; }
+    .terms-body p { font-size: 12px; color: #666; line-height: 1.8; margin-bottom: 0.5rem; }
+    .terms-body p:last-child { margin-bottom: 0; }
+    .agree-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding: 12px 14px; border: 0.5px solid #e0dce8; border-radius: 8px; cursor: pointer; transition: border-color 0.2s; }
+    .agree-wrap:hover { border-color: #B0A0C8; }
+    .agree-wrap.checked { border-color: #B0A0C8; background: #f5f0fa; }
+    .agree-circle { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #ccc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .agree-wrap.checked .agree-circle { background: #B0A0C8; border-color: #B0A0C8; }
+    .agree-check { display: none; color: #fff; font-size: 12px; }
+    .agree-wrap.checked .agree-check { display: block; }
+    .agree-text { font-size: 12px; color: #666; line-height: 1.6; }
     .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #ede8f5; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 28px; }
     .success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
     .success-sub { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 2rem; }
     .booking-code { display: inline-block; border: 0.5px solid #B0A0C8; border-radius: 8px; padding: 8px 20px; font-size: 18px; letter-spacing: 0.25em; color: #9070B8; margin-bottom: 2rem; }
-
+    
     .page { display: none; }
     .page.active { display: block; }
   </style>
@@ -170,21 +183,22 @@
     <!-- Page 3 -->
     <div id="page3" class="page">
       <div class="section-title">填寫個人資料</div>
+      <p class="form-notice">所有資料作為工作室顧客聯絡及資料管理使用，不另作推銷與其他用途。</p>
       <div class="form-group">
-        <label class="form-label">姓名</label>
-        <input class="form-input" type="text" placeholder="您的姓名" id="fName">
+        <label class="form-label">如何稱呼</label>
+        <input class="form-input" type="text" placeholder="姓名或暱稱皆可" id="fName">
       </div>
       <div class="form-group">
         <label class="form-label">IG 帳號</label>
-        <input class="form-input" type="text" placeholder="@yourhandle" id="fIG">
+        <input class="form-input" type="text" placeholder="" id="fIG">
       </div>
       <div class="form-group">
-        <label class="form-label">電子郵件（選填）</label>
+        <label class="form-label">電子郵件</label>
         <input class="form-input" type="email" placeholder="your@email.com" id="fEmail">
       </div>
       <div class="form-group">
-        <label class="form-label">備註</label>
-        <textarea class="form-input" rows="3" placeholder="例如：想做的顏色、參考圖案等..." id="fNote" style="resize:none;"></textarea>
+        <label class="form-label">備註（選填）</label>
+        <textarea class="form-input" rows="5" id="fNote" style="resize:none;" placeholder="素材以工作室現場為主，如有欲施作款式請務必於預約日三天前傳圖詢問。&#10;恕不接受精密手繪、版權物（例：三麗鷗、吉伊卡哇、吉卜力工作室...等）繪製。"></textarea>
       </div>
       <button class="btn-primary" id="btn3">下一步 — 確認預約</button>
       <button class="btn-secondary" id="back2">返回上一步</button>
@@ -194,7 +208,24 @@
     <div id="page4" class="page">
       <div class="section-title">確認預約資訊</div>
       <div class="summary-card" id="summaryCard"></div>
-      <button class="btn-primary" id="btnConfirm">確認預約</button>
+      <div class="terms-card">
+        <div class="terms-title">預約須知</div>
+        <div class="terms-body">
+          <p>1. 場地空間有限，且公共空間與其他工作室共用，恕不接受攜伴。</p>
+          <p>2. 預約成功後如需更改時間，請提前兩天以上告知。</p>
+          <p>3. 本店秉持信任原則，不額外收取訂金與取消費，當天約定時間遲到 15 分鐘以上且未主動告知，視為自動取消。日後也將不再受理任何預約。</p>
+          <p>4. 本店各服務項目訂價已盡量公開透明，恕不接受議價、事後付款。</p>
+          <p>5. 為維持服務品質與良好成品，請務必保留充裕時間，恕不接受任何形式與理由的催趕。</p>
+          <p>🌝 客人有選擇美甲師的權利，美甲師也有權利決定是否提供服務。如在施作過程中，雙方有無法解決的認知落差或溝通歧異，我方有權終止服務。</p>
+          <p>🌝 若發現本甲有綠膿桿菌感染、斷裂，或手部有疑似病變、病毒疣等問題，同意由我方判斷是否繼續施作。</p>
+          <p>🌝 我方保有所有規則最終解釋權。</p>
+        </div>
+      </div>
+      <div class="agree-wrap" id="agreeWrap">
+        <div class="agree-circle"><span class="agree-check">✓</span></div>
+        <span class="agree-text">我已閱讀並同意以上預約須知</span>
+      </div>
+      <button class="btn-primary" id="btnConfirm" disabled>確認預約</button>
       <button class="btn-secondary" id="back3">返回修改</button>
     </div>
 
@@ -345,8 +376,21 @@
   document.getElementById('btn1').addEventListener('click', () => { if (state.date && state.slot) showPage(2); });
   document.getElementById('back1').addEventListener('click', () => showPage(1));
   document.getElementById('back2').addEventListener('click', () => showPage(2));
-  document.getElementById('back3').addEventListener('click', () => showPage(3));
+  document.getElementById('back3').addEventListener('click', () => {
+    // reset agree when going back
+    document.getElementById('agreeWrap').classList.remove('checked');
+    document.getElementById('btnConfirm').disabled = true;
+    showPage(3);
+  });
 
+  // ── 預約須知同意 ───────────────────────────────────
+  document.getElementById('agreeWrap').addEventListener('click', () => {
+    const wrap = document.getElementById('agreeWrap');
+    const btn = document.getElementById('btnConfirm');
+    wrap.classList.toggle('checked');
+    btn.disabled = !wrap.classList.contains('checked');
+  });
+ 
   // ── Service data ──────────────────────────────────────────────
   const SERVICES = {
     '卸甲': {
@@ -626,6 +670,8 @@ function loadBookedSlots() {
     initBlocks();
     ['fName','fIG','fEmail','fNote'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('btn2').disabled = true;
+     document.getElementById('agreeWrap').classList.remove('checked');
+    document.getElementById('btnConfirm').disabled = true;
     showPage(1);
   }
 
