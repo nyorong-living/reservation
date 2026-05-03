@@ -472,7 +472,7 @@
   initBlocks();
 
   document.getElementById('btn2').addEventListener('click', () => {
-    if (['卸甲','凝膠','造型'].every(cat => svcState[cat].item !== null)) showPage(3);
+    if (['卸甲','凝膠'].every(cat => svcState[cat].item !== null)) showPage(3);
   });
 
   document.getElementById('btn3').addEventListener('click', () => {
