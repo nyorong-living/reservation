@@ -51,6 +51,8 @@
     .time-slot { border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
     .time-slot:hover { border-color: #B0A0C8; color: #9070B8; }
     .time-slot.selected { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
+    .time-slot.booked { background: #f5f5f5; border-color: #e8e8e8; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
+    .time-slot.booked:hover { border-color: #e8e8e8; color: #ccc; }
 
     /* Service blocks */
     .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
@@ -316,6 +318,7 @@
           state.date = thisDate;
           renderCalendar();
           checkPage1();
+          updateTimeSlots();
         });
       } else {
         el.classList.add('disabled');
@@ -340,6 +343,7 @@
 
   document.querySelectorAll('.time-slot').forEach(el => {
     el.addEventListener('click', () => {
+      if (el.classList.contains('booked')) return;
       document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
       el.classList.add('selected');
       state.slot = el.dataset.slot;
@@ -519,7 +523,42 @@
   }
 
   // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxjyQYUf1dF9l9WCjexiUyHz6sgKEPrxfk4OmWDyF3ol1lS6n46gBuCqZlH_xQtFtM/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwUXx-V2AveWPys-sX9vtBUD-dZv-yWIahX_TX9qddwFY1q52jR4-A_YRV3orvTDhTS/exec';
+
+  // ── 已預約時段 ─────────────────────────────────────
+  let bookedSlots = {};
+
+  async function loadBookedSlots() {
+    try {
+      const res = await fetch(GAS_URL + '?action=getBooked');
+      const data = await res.json();
+      if (data.success) bookedSlots = data.booked;
+    } catch (e) {
+      console.warn('無法載入已預約時段', e);
+    }
+  }
+
+  function isSlotBooked(date, slot) {
+    if (!date) return false;
+    const dateStr = date.getFullYear() + ' 年 ' + (date.getMonth()+1) + ' 月 ' + date.getDate() + ' 日';
+    return bookedSlots[dateStr + '_' + slot] === true;
+  }
+
+  function updateTimeSlots() {
+    document.querySelectorAll('.time-slot').forEach(el => {
+      const slot = el.dataset.slot;
+      if (isSlotBooked(state.date, slot)) {
+        el.classList.add('booked');
+        el.classList.remove('selected');
+        if (state.slot === slot) {
+          state.slot = null;
+          checkPage1();
+        }
+      } else {
+        el.classList.remove('booked');
+      }
+    });
+  }
 
   document.getElementById('btnConfirm').addEventListener('click', async () => {
     const btn = document.getElementById('btnConfirm');
@@ -579,7 +618,9 @@
     showPage(1);
   }
 
-  renderCalendar();
+  loadBookedSlots().then(() => {
+    renderCalendar();
+  });
 </script>
 </body>
 </html>
