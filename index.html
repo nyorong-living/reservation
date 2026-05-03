@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #faf9fc; color: #2a2a2a; font-family: 'Jost', sans-serif; font-weight: 300; }
+    body { background: #f4f8fb; color: #2a2a2a; font-family: 'Jost', sans-serif; font-weight: 300; }
     .app { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; min-height: 100vh; }
     .inner { max-width: 480px; margin: 0 auto; }
 
@@ -18,100 +18,100 @@
     .step-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem; }
     .step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaa; background: #fff; transition: all 0.25s; }
-    .step.active .step-dot { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
-    .step.done .step-dot { background: #f0ecf7; border-color: #B0A0C8; color: #B0A0C8; }
+    .step.active .step-dot { background: #c6d8e6; border-color: #c6d8e6; color: #fff; }
+    .step.done .step-dot { background: #e8f1f6; border-color: #c6d8e6; color: #c6d8e6; }
     .step-label { font-size: 10px; letter-spacing: 0.12em; color: #aaa; }
-    .step.active .step-label { color: #B0A0C8; }
-    .step-line { flex: 1; height: 1px; background: #e5e5e5; max-width: 60px; margin-bottom: 18px; }
+    .step.active .step-label { color: #7aaac0; }
+    .step-line { flex: 1; height: 1px; background: #dce8ef; max-width: 60px; margin-bottom: 18px; }
 
     .section-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 1.25rem; color: #2a2a2a; }
 
-    .datetime-wrap { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 2rem; background: #fff; }
-    .cal-section { padding: 1.25rem; border-bottom: 0.5px solid #e0dce8; }
+    .datetime-wrap { border: 0.5px solid #c6d8e6; border-radius: 12px; overflow: hidden; margin-bottom: 2rem; background: #fff; }
+    .cal-section { padding: 1.25rem; border-bottom: 0.5px solid #c6d8e6; }
     .time-section { padding: 1.25rem; }
     .block-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; }
 
     .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .cal-title { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; }
-    .cal-nav { background: none; border: 0.5px solid #e0dce8; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .cal-nav:hover:not(:disabled) { border-color: #B0A0C8; color: #B0A0C8; }
+    .cal-nav { background: none; border: 0.5px solid #c6d8e6; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .cal-nav:hover:not(:disabled) { border-color: #f97279; color: #f97279; }
     .cal-nav:disabled { opacity: 0.25; cursor: default; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-dow { text-align: center; font-size: 10px; color: #aaa; letter-spacing: 0.08em; padding: 4px 0 8px; }
-    .cal-dow.weekend { color: #e07070; }
+    .cal-dow.weekend { color: #f97279; }
     .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: default; transition: all 0.2s; color: #2a2a2a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
-    .cal-day.weekend { color: #e07070; }
+    .cal-day.weekend { color: #f97279; }
     .cal-day.available { cursor: pointer; }
-    .cal-day.available:hover { background: #ede8f5; }
-    .cal-day.selected { background: #B0A0C8 !important; color: #fff !important; cursor: pointer; }
+    .cal-day.available:hover { background: #dceef7; }
+    .cal-day.selected { background: #c6d8e6 !important; color: #fff !important; cursor: pointer; }
     .cal-day.disabled { color: #ccc !important; opacity: 0.35; }
     .cal-day.empty { }
 
     .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .time-slot { border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
-    .time-slot:hover { border-color: #B0A0C8; color: #9070B8; }
-    .time-slot.selected { background: #B0A0C8; border-color: #B0A0C8; color: #fff; }
+    .time-slot { border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
+    .time-slot:hover { border-color: #f97279; color: #f97279; }
+    .time-slot.selected { background: #c6d8e6; border-color: #c6d8e6; color: #fff; }
     .time-slot.booked { background: #f5f5f5; border-color: #e8e8e8; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
     .time-slot.booked:hover { border-color: #e8e8e8; color: #ccc; }
 
     /* Service blocks */
   .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
     .svc-block-header { padding: 12px 16px; background: #f5f0fa; display: flex; align-items: center; justify-content: space-between; }
-    .svc-block-title { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; color: #9070B8; text-transform: uppercase; }
-    .svc-block-selected { font-size: 12px; color: #B0A0C8; }
+    .svc-block-title { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; color: #5a9ab5; text-transform: uppercase; }
+    .svc-block-selected { font-size: 12px; color: #f97279; }
     .svc-block-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-    .sub-item { display: flex; align-items: center; justify-content: space-between; border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; background: #fff; }
-    .sub-item:hover { border-color: #B0A0C8; }
-    .sub-item.selected { border: 1.5px solid #B0A0C8; background: #f5f0fa; }
+    .sub-item { display: flex; align-items: center; justify-content: space-between; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; background: #fff; }
+    .sub-item:hover { border-color: #f97279; }
+    .sub-item.selected { border: 1.5px solid #c6d8e6; background: #e8f1f6; }
     .sub-item-name { font-size: 13px; color: #2a2a2a; }
-    .sub-item-price { font-size: 13px; color: #9070B8; font-weight: 500; }
+    .sub-item-price { font-size: 13px; color: #f97279; font-weight: 500; }
     .addon-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #aaa; padding: 8px 14px 4px; }
-    .sub-item.addon { background: #fdfbff; }
-    .sub-item.addon.selected { border: 1.5px solid #c8b8e0; background: #f0eafa; }
-    .sub-item.addon .sub-item-price { color: #b090d0; }
+    .sub-item.addon { background: #f8fbfd; }
+    .sub-item.addon.selected { border: 1.5px solid #a8c8d8; background: #dceef7; }
+    .sub-item.addon .sub-item-price { color: #f97279; }
 
     .form-group { margin-bottom: 1rem; }
     .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
-    .form-input { width: 100%; border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
-    .form-input:focus { outline: none; border-color: #B0A0C8; }
+    .form-input { width: 100%; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
+    .form-input:focus { outline: none; border-color: #f97279; }
  
-    .summary-card { border: 0.5px solid #B0A0C8; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; background: #f5f0fa; }
-    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #e0dce8; }
+    .summary-card { border: 0.5px solid #e8f1f6; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; background: #e8f1f6; }
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #c6d8e6; }
     .summary-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; margin-top: 4px; }
     .summary-label { color: #666; }
     .summary-value { color: #2a2a2a; }
-    .summary-value.price { color: #9070B8; }
+    .summary-value.price { color: #f97279; }
 
-    .btn-primary { width: 100%; background: #B0A0C8; border: none; border-radius: 8px; padding: 14px; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; cursor: pointer; font-family: 'Jost', sans-serif; transition: background 0.2s; margin-bottom: 0.75rem; }
-    .btn-primary:hover:not(:disabled) { background: #9070B8; }
+    .btn-primary { width: 100%; background: #c6d8e6; border: none; border-radius: 8px; padding: 14px; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; cursor: pointer; font-family: 'Jost', sans-serif; transition: background 0.2s; margin-bottom: 0.75rem; }
+    .btn-primary:hover:not(:disabled) { background: #a8c2d4; }
     .btn-primary:disabled { opacity: 0.4; cursor: default; }
     .btn-secondary { width: 100%; background: none; border: 0.5px solid #ccc; border-radius: 8px; padding: 12px; font-size: 12px; letter-spacing: 0.1em; color: #666; cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.2s; }
-    .btn-secondary:hover { border-color: #B0A0C8; color: #B0A0C8; }
+    .btn-secondary:hover { border-color: #f97279; color: #f97279; }
 
     .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
-    .form-notice { font-size: 11px; color: #aaa; letter-spacing: 0.04em; line-height: 1.7; margin-bottom:1.25rem; padding: 10px 14px; background: #f5f0fa; border-radius: 8px; border-left: 2px solid #B0A0C8;}
-    .terms-card { border: 0.5px solid #e0dce8; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; background: #fdfbff; }
-    .terms-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #B0A0C8; margin-bottom: 1rem; }
+    .form-notice { font-size: 11px; color: #aaa; letter-spacing: 0.04em; line-height: 1.7; margin-bottom:1.25rem; padding: 10px 14px; background: #c6d8e6; border-radius: 8px; border-left: 2px solid #B0A0C8;}
+    .terms-card { border: 0.5px solid #c6d8e6; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; background: #f8fbfd; }
+    .terms-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7aaac0; margin-bottom: 1rem; }
     .terms-body p { font-size: 12px; color: #666; line-height: 1.8; margin-bottom: 0.5rem; }
     .terms-body p:last-child { margin-bottom: 0; }
     .agree-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding: 12px 14px; border: 0.5px solid #e0dce8; border-radius: 8px; cursor: pointer; transition: border-color 0.2s; }
-    .agree-wrap:hover { border-color: #B0A0C8; }
-    .agree-wrap.checked { border-color: #B0A0C8; background: #f5f0fa; }
+    .agree-wrap:hover { border-color: #f97279; }
+    .agree-wrap.checked { border-color: #c6d8e6; background: #e8f1f6; }
     .agree-circle { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #ccc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .agree-wrap.checked .agree-circle { background: #B0A0C8; border-color: #B0A0C8; }
+    .agree-wrap.checked .agree-circle { background: #f97279; border-color: #f97279; }
     .agree-check { display: none; color: #fff; font-size: 12px; }
     .agree-wrap.checked .agree-check { display: block; }
     .agree-text { font-size: 12px; color: #666; line-height: 1.6; }
-    .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #ede8f5; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 28px; }
+    .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #dceef7; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 28px; }
     .success-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
     .success-sub { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 2rem; }
-    .booking-code { display: inline-block; border: 0.5px solid #B0A0C8; border-radius: 8px; padding: 8px 20px; font-size: 18px; letter-spacing: 0.25em; color: #9070B8; margin-bottom: 1.5rem; }
-    .cal-btn-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
-    .btn-cal { border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 8px; font-size: 12px; font-family: 'Jost', sans-serif; font-weight: 400; letter-spacing: 0.06em; cursor: pointer; transition: all 0.2s; background: #fff; color: #666; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-cal:hover { border-color: #B0A0C8; color: #9070B8; }
-    .cal-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
-    .map-link { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #9070B8; text-decoration: none; letter-spacing: 0.04em; margin-bottom: 1.5rem; padding: 10px 14px; border: 0.5px solid #e0dce8; border-radius: 8px; transition: all 0.2s; }
-    .map-link:hover { border-color: #B0A0C8; background: #f5f0fa; }
+    .cal-btn-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+    .btn-cal { border: 1.5px solid #c6d8e6; border-radius: 10px; padding: 16px 8px; font-size: 14px; font-family: 'Jost', sans-serif; font-weight: 500; letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s; background: #fff; color: #5a9ab5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .btn-cal svg { width: 22px; height: 22px; }
+    .btn-cal:hover { border-color: #f97279; color: #f97279; background: #fff8f8; }
+    .cal-label { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #5a9ab5; margin-bottom: 1rem; }
+    .map-link { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #7aaac0; text-decoration: none; letter-spacing: 0.04em; margin-bottom: 1.5rem; padding: 10px 14px; border: 0.5px solid #c6d8e6; border-radius: 8px; transition: all 0.2s; }
+    .map-link:hover { border-color: #f97279; color: #f97279; }
     
     .page { display: none; }
     .page.active { display: block; }
@@ -240,26 +240,21 @@
       <div class="success-icon">🌸</div>
       <div class="success-title">預約成功！</div>
       <div class="success-sub">感謝您預約 nyorong nail 嬉希工作室。<br>我們將盡快與您確認。</div>
-      <div class="booking-code" id="bookingCode"></div>
-      <a class="map-link" href="https://maps.google.com/?q=台北市民權東路三段106巷1號2樓" target="_blank">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        台北市民權東路三段 106 巷 1 號 2 樓
-      </a>
       <div class="cal-label">加入行事曆</div>
       <div class="cal-btn-wrap">
         <button class="btn-cal" id="btnGoogleCal">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Google 日曆
         </button>
         <button class="btn-cal" id="btnAppleCal">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Apple 日曆
         </button>
       </div>
       <button class="btn-primary" onclick="resetAll()">返回首頁</button>
     </div>
   </div>
-</div> 
+</div>
  
 <script>
   const state = {
@@ -580,7 +575,7 @@
   }
 
   // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbykOx7GZdVKmPN-KILnLNldeDY8oIvPIfB1kVvH2LhHjHARAd7bvqY5NPykv5gcD7LB/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwbgwsezahLbukqZbnxhufwiI6YTI06Upc3hFeSBl0LJtkKYawZKg5E6_1LNCJ25yYt/exec';
 
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
@@ -665,8 +660,7 @@ function loadBookedSlots() {
       });
       const result = await res.json();
 
-      if (result.success) {
-        document.getElementById('bookingCode').textContent = result.bookingCode;
+     if (result.success) {
         setupCalendarButtons();
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('successPage').style.display = 'block';
