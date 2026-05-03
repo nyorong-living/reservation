@@ -574,7 +574,7 @@
   }
 
   // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzQ7FU6bN2seCmUjiTOz5o4ZLZJvRNpu8wHlThUmpOuHVHRyeN8T56Znn4R1gVfcB7w/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzCnWsbtsWgxmQ1lq-B-s-yDlib-bza-7I2i-SvgHIU1Tz3cUjaFaYdE86YF7NPRE45/exec';
 
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
@@ -708,7 +708,7 @@ function loadBookedSlots() {
   function setupCalendarButtons() {
     const d = state.date;
     const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
-    const times = parseBookingDateTime(dateStr, state.slot, 120);
+    const times = parseBookingDateTime(dateStr, state.slot, 180);
     if (!times) return;
  
     const title = encodeURIComponent('nyorong nail 嬉希工作室 美甲預約');
