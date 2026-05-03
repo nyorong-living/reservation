@@ -520,15 +520,18 @@
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
 
-  async function loadBookedSlots() {
-    try {
-      const res = await fetch(GAS_URL + '?action=getBooked');
-      const data = await res.json();
-      if (data.success) bookedSlots = data.booked;
-    } catch (e) {
-      console.warn('無法載入已預約時段', e);
-    }
+ async function loadBookedSlots() {
+  try {
+    const res = await fetch(GAS_URL + '?action=getBooked', {
+      method: 'GET',
+      redirect: 'follow',
+    });
+    const data = await res.json();
+    if (data.success) bookedSlots = data.booked;
+  } catch (e) {
+    console.warn('無法載入已預約時段', e);
   }
+}
 
   function isSlotBooked(date, slot) {
     if (!date) return false;
