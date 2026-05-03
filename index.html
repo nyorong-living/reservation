@@ -520,18 +520,35 @@
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
 
- async function loadBookedSlots() {
-  try {
-    const res = await fetch(GAS_URL + '?action=getBooked', {
-      method: 'GET',
-      redirect: 'follow',
+function loadBookedSlots() {
+    return new Promise((resolve) => {
+      const callbackName = '_gasCallback_' + Date.now();
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => {
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        console.warn('無法載入已預約時段：請求逾時');
+        resolve();
+      }, 5000);
+ 
+      window[callbackName] = function(data) {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        if (script.parentNode) document.body.removeChild(script);
+        if (data && data.success) bookedSlots = data.booked;
+        resolve();
+      };
+ 
+      script.src = GAS_URL + '?action=getBooked&callback=' + callbackName;
+      script.onerror = () => {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        console.warn('無法載入已預約時段：載入失敗');
+        resolve();
+      };
+      document.body.appendChild(script);
     });
-    const data = await res.json();
-    if (data.success) bookedSlots = data.booked;
-  } catch (e) {
-    console.warn('無法載入已預約時段', e);
   }
-}
 
   function isSlotBooked(date, slot) {
     if (!date) return false;
