@@ -110,6 +110,8 @@
     .btn-cal { border: 0.5px solid #e0dce8; border-radius: 8px; padding: 10px 8px; font-size: 12px; font-family: 'Jost', sans-serif; font-weight: 400; letter-spacing: 0.06em; cursor: pointer; transition: all 0.2s; background: #fff; color: #666; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn-cal:hover { border-color: #B0A0C8; color: #9070B8; }
     .cal-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
+    .map-link { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #9070B8; text-decoration: none; letter-spacing: 0.04em; margin-bottom: 1.5rem; padding: 10px 14px; border: 0.5px solid #e0dce8; border-radius: 8px; transition: all 0.2s; }
+    .map-link:hover { border-color: #B0A0C8; background: #f5f0fa; }
     
     .page { display: none; }
     .page.active { display: block; }
@@ -239,6 +241,10 @@
       <div class="success-title">預約成功！</div>
       <div class="success-sub">感謝您預約 nyorong nail 嬉希工作室。<br>我們將盡快與您確認。</div>
       <div class="booking-code" id="bookingCode"></div>
+      <a class="map-link" href="https://maps.google.com/?q=台北市民權東路三段106巷1號2樓" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        台北市民權東路三段 106 巷 1 號 2 樓
+      </a>
       <div class="cal-label">加入行事曆</div>
       <div class="cal-btn-wrap">
         <button class="btn-cal" id="btnGoogleCal">
@@ -253,7 +259,7 @@
       <button class="btn-primary" onclick="resetAll()">返回首頁</button>
     </div>
   </div>
-</div>
+</div> 
  
 <script>
   const state = {
@@ -770,4 +776,3 @@ function loadBookedSlots() {
 </script>
 </body>
 </html>
- 
