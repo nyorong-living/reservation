@@ -572,7 +572,7 @@
       ['IG 帳號', state.ig],
       ...(state.email ? [['電子郵件', state.email]] : []),
       ...(state.note ? [['備註', state.note]] : []),
-      ['合計費用', 'NT$' + total.toLocaleString() + (hasCustom ? '（客製化費用另計）' : '')],
+      ['參考費用', 'NT$' + total.toLocaleString() + (hasCustom ? '（客製化費用另計）' : '')],
     ];
     document.getElementById('summaryCard').innerHTML = rows.map((r, i) =>
       `<div class="summary-row"><span class="summary-label">${r[0]}</span><span class="summary-value${i===rows.length-1?' price':''}">${r[1]}</span></div>`
@@ -580,7 +580,7 @@
   }
 
   // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzd3IsYKRVlld0rDxPOZ_yIo69JrH2O7URj1kjIWS19P3hjwO6sboYwL5tjLXmcFDrQ/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwA-5PA_6AJY60np1uE2Z_cw9kXm0C3Z7SuTcMm5RqAw7DJxh9CcL89ihnJffRnIk8Y/exec';
 
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
