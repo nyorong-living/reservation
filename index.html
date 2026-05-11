@@ -44,8 +44,10 @@
     .cal-day.available { cursor: pointer; }
     .cal-day.available:hover { background: #dceef7; }
     .cal-day.selected { background: #c6d8e6 !important; color: #fff !important; cursor: pointer; }
-    .cal-day.disabled { color: #ccc !important; opacity: 0.35; }
-    .cal-day.empty { }
+    .cal-day.today { font-weight: 500; color: #f97279 !important; position: relative; }
+    .cal-day.today::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #f97279; }
+    .cal-day.today.selected { color: #fff !important; }
+    .cal-day.today.selected::after { background: #fff; }
 
     .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .time-slot { border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
@@ -345,6 +347,10 @@
 
       if (isSat || isSun) el.classList.add('weekend');
 
+      const today = new Date();
+      const isToday = thisDate.toDateString() === today.toDateString();
+      if (isToday) el.classList.add('today');
+ 
       const available = isAvailable(calYear, calMonth, d);
 
       if (available) {
