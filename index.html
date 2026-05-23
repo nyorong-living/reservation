@@ -39,7 +39,7 @@
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-dow { text-align: center; font-size: 10px; color: #aaa; letter-spacing: 0.08em; padding: 4px 0 8px; }
     .cal-dow.weekend { color: #f97279; }
-    .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: default; transition: all 0.2s; color: #2a2a2a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+    .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: default; transition: all 0.2s; color: #2a2a2a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative; }
     .cal-day.weekend { color: #f97279; }
     .cal-day.available { cursor: pointer; }
     .cal-day.available:hover { background: #dceef7; }
@@ -50,6 +50,8 @@
     .cal-day.today.selected::after { background: #fff; }
     .cal-day.past { color: #ccc !important; cursor: default; }
     .cal-day.past.weekend { color: #f5b8bb !important; }
+    .cal-day.available::before { content: ''; position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #c6d8e6; }
+    .cal-day.available.selected::before { background: rgba(255,255,255,0.6); }
 
     .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .time-slot { border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
@@ -57,7 +59,7 @@
     .time-slot.selected { background: #c6d8e6; border-color: #c6d8e6; color: #fff; }
     .time-slot.booked { background: #f5f5f5; border-color: #e8e8e8; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
     .time-slot.booked:hover { border-color: #e8e8e8; color: #ccc; }
-
+    
     /* Service blocks */
     .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
     .svc-block-header { padding: 12px 16px; background: #e8f1f6; display: flex; align-items: center; justify-content: space-between; }
@@ -73,7 +75,7 @@
     .sub-item.addon { background: #f8fbfd; }
     .sub-item.addon.selected { border: 1.5px solid #a8c8d8; background: #dceef7; }
     .sub-item.addon .sub-item-price { color: #f97279; }
-
+    
     .form-group { margin-bottom: 1rem; }
     .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
     .form-input { width: 100%; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
@@ -341,14 +343,14 @@
       const el = document.createElement('div');
       el.className = 'cal-day';
       el.textContent = d;
-
+ 
       const thisDate = new Date(calYear, calMonth, d);
       const jsDay = thisDate.getDay(); // 0=Sun, 6=Sat
       const isSat = jsDay === 6;
       const isSun = jsDay === 0;
-
+ 
       if (isSat || isSun) el.classList.add('weekend');
-
+ 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const isToday = thisDate.toDateString() === today.toDateString();
@@ -356,7 +358,7 @@
  
       const isPast = thisDate < today;
       const available = isAvailable(calYear, calMonth, d);
-
+ 
       if (isPast) {
         el.classList.add('past');
       } else if (available) {
@@ -628,10 +630,22 @@ function loadBookedSlots() {
     return bookedSlots[dateStr + '_' + slot] === true;
   }
 
+  function isSlotPast(date, slot) {
+    const now = new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (!date || date > today) return false;
+    if (date < today) return true;
+    const [h, m] = slot.split(':').map(Number);
+    const slotTime = new Date(date);
+    slotTime.setHours(h, m, 0, 0);
+    return now >= slotTime;
+  }
+  
   function updateTimeSlots() {
     document.querySelectorAll('.time-slot').forEach(el => {
       const slot = el.dataset.slot;
-      if (isSlotBooked(state.date, slot)) {
+      if (isSlotBooked(state.date, slot) || isSlotPast(state.date, slot)) {
         el.classList.add('booked');
         el.classList.remove('selected');
         if (state.slot === slot) {
@@ -643,7 +657,7 @@ function loadBookedSlots() {
       }
     });
   }
-
+  
   document.getElementById('btnConfirm').addEventListener('click', async () => {
     const btn = document.getElementById('btnConfirm');
     btn.disabled = true;
