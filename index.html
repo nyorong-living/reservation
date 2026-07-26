@@ -180,7 +180,7 @@
       </div>
 
       <!-- 凝膠 -->
-      <div class="svc-block">
+      <div class="svc-block" id="block-凝膠">
         <div class="svc-block-header">
           <span class="svc-block-title">凝膠</span>
           <span class="svc-block-selected" id="sel-凝膠">請選擇</span>
@@ -428,8 +428,8 @@
         { name: '本店續作',              price: 200 },
         { name: '他店續作',              price: 300 },
         { name: '指甲油（含透明硬甲油）', price: 50  },
-        { name: '本店純卸甲',            price: 400, showAddon: true },
-        { name: '他店純卸甲',            price: 500, showAddon: true }, 
+        { name: '本店純卸甲',            price: 400, showAddon: true, disablesGel: true },
+        { name: '他店純卸甲',            price: 500, showAddon: true, disablesGel: true }, 
         { name: '不需卸甲',              price: 0   },
       ],
       addons: [
@@ -456,7 +456,9 @@
   };
  
   function checkPage2() {
-    const allSelected = ['卸甲','凝膠'].every(cat => svcState[cat].item !== null);
+    const gelHidden = document.getElementById('block-凝膠').style.display === 'none';
+    const gelOk = gelHidden || svcState['凝膠'].item !== null;
+    const allSelected = svcState['卸甲'].item !== null && gelOk;
     document.getElementById('btn2').disabled = !allSelected;
   }
  
@@ -479,15 +481,21 @@
       else if (item.price === 0) priceStr = 'NT$0';
       else priceStr = 'NT$' + item.price.toLocaleString();
       el.innerHTML = `<span class="sub-item-name">${item.name}</span><span class="sub-item-price">${priceStr}</span>`;
-      el.addEventListener('click', () => {
+       el.addEventListener('click', () => {
         svcState[cat].item = item.name;
         svcState[cat].itemPrice = typeof item.price === 'number' ? item.price : 0;
-        // 切換選項時清除加購
         if (!item.showAddon) {
           svcState[cat].addon = null;
           svcState[cat].addonPrice = 0;
         }
         renderBlock(cat);
+        if (cat === '卸甲') {
+          const locked = !!item.disablesGel;
+          document.getElementById('block-凝膠').style.display = locked ? 'none' : '';
+          if (locked) {
+            svcState['凝膠'] = { item: null, addon: null, itemPrice: 0, addonPrice: 0 };
+          }
+        }
         checkPage2();
       });
       body.appendChild(el);
@@ -537,16 +545,19 @@
 
   function getServiceSummary() {
     return ['卸甲','凝膠'].map(cat => {
+      if (!svcState[cat].item) return null;
       let txt = cat + '：' + svcState[cat].item;
       if (svcState[cat].addon) txt += '＋' + svcState[cat].addon;
       return txt;
-    }).join('　');
+    }).filter(Boolean).join('　');
   }
 
   initBlocks();
 
   document.getElementById('btn2').addEventListener('click', () => {
-    if (['卸甲','凝膠'].every(cat => svcState[cat].item !== null)) showPage(3);
+    const gelHidden = document.getElementById('block-凝膠').style.display === 'none';
+    const gelOk = gelHidden || svcState['凝膠'].item !== null;
+    if (svcState['卸甲'].item !== null && gelOk) showPage(3);
   });
 
   document.getElementById('btn3').addEventListener('click', () => {
