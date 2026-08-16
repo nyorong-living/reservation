@@ -93,6 +93,12 @@
     .btn-primary:disabled { opacity: 0.4; cursor: default; }
     .btn-secondary { width: 100%; background: none; border: 0.5px solid #ccc; border-radius: 8px; padding: 12px; font-size: 12px; letter-spacing: 0.1em; color: #666; cursor: pointer; font-family: 'Jost', sans-serif; transition: all 0.2s; }
     .btn-secondary:hover { border-color: #f97279; color: #f97279; }
+    .verify-wrap { text-align: center; padding: 1rem 0; }
+    .verify-input { width: 160px; text-align: center; font-size: 24px; letter-spacing: 0.3em; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 12px; font-family: 'Jost', sans-serif; color: #2a2a2a; }
+    .verify-input:focus { outline: none; border-color: #f97279; }
+    .verify-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+    .verify-resend { font-size: 12px; color: #c6d8e6; cursor: pointer; margin-top: 12px; display: inline-block; }
+    .verify-resend:hover { color: #f97279; }
 
     .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
     .form-notice { font-size: 11px; color: #aaa; letter-spacing: 0.04em; line-height: 1.7; margin-bottom:1.25rem; padding: 10px 14px; background: #c6d8e6; border-radius: 8px; border-left: 2px solid #B0A0C8;}
@@ -216,6 +222,19 @@
       <button class="btn-secondary" id="back2">返回上一步</button>
     </div>
 
+    <!-- Page 3v: 驗證碼 -->
+<div id="page3v" class="page">
+  <div class="section-title">驗證電子郵件</div>
+  <p class="form-notice">驗證碼已寄送至 <span id="verifyEmailHint" style="color:#5a9ab5;"></span>，請於 10 分鐘內輸入。</p>
+  <div class="verify-wrap">
+    <input class="verify-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" id="fVerifyCode">
+    <p class="verify-hint">若未收到信件，請確認垃圾郵件資料夾。</p>
+    <span class="verify-resend" id="btnResend">重新發送驗證碼</span>
+  </div>
+  <button class="btn-primary" id="btn3v" style="margin-top:1.5rem;">驗證並繼續</button>
+  <button class="btn-secondary" id="back3v">返回修改資料</button>
+</div>
+    
     <!-- Page 4 -->
     <div id="page4" class="page">
       <div class="section-title">確認預約資訊</div>
@@ -293,12 +312,12 @@
   }
 
   function showPage(n) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('successPage').style.display = 'none';
-    const pg = document.getElementById('page' + n);
-    if (pg) pg.classList.add('active');
-    updateSteps(n);
-  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('successPage').style.display = 'none';
+  const pg = document.getElementById('page' + n);
+  if (pg) pg.classList.add('active');
+  if (typeof n === 'number') updateSteps(n);
+}
 
   function updateSteps(n) {
     document.querySelectorAll('.step').forEach(s => {
@@ -560,15 +579,57 @@
     if (svcState['卸甲'].item !== null && gelOk) showPage(3);
   });
 
-  document.getElementById('btn3').addEventListener('click', () => {
-    const n = document.getElementById('fName').value.trim();
-    const ig = document.getElementById('fIG').value.trim();
-    if (!n || !ig) { alert('請填寫姓名與 IG 帳號'); return; }
-    state.name = n; state.ig = ig;
-    state.email = document.getElementById('fEmail').value;
-    state.note = document.getElementById('fNote').value;
-    renderSummary(); showPage(4);
-  });
+  async function sendVerificationCode() {
+  const btn = document.getElementById('btn3');
+  btn.disabled = true;
+  btn.textContent = '寄送中…';
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'sendVerification', email: state.email }),
+    });
+    const result = await res.json();
+    if (result.success) {
+      document.getElementById('verifyEmailHint').textContent = state.email;
+      showPage('3v');
+    } else {
+      alert('驗證碼寄送失敗，請稍後再試。');
+    }
+  } catch (err) {
+    alert('網路錯誤，請確認連線後再試。');
+  }
+  btn.disabled = false;
+  btn.textContent = '下一步 — 確認預約';
+}
+
+document.getElementById('btn3').addEventListener('click', async () => {
+  const n = document.getElementById('fName').value.trim();
+  const ig = document.getElementById('fIG').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  if (!n) { alert('請填寫稱呼'); return; }
+  if (!ig) { alert('請填寫 IG 帳號'); return; }
+  if (!email) { alert('請填寫電子郵件'); return; }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) { alert('電子郵件格式不正確，請確認後再試。'); return; }
+  state.name = n; state.ig = ig;
+  state.email = email;
+  state.note = document.getElementById('fNote').value;
+  await sendVerificationCode();
+});
+
+document.getElementById('btn3v').addEventListener('click', () => {
+  const code = document.getElementById('fVerifyCode').value.trim();
+  if (code.length !== 6) { alert('請輸入六位數驗證碼'); return; }
+  state.verifyCode = code;
+  renderSummary();
+  showPage(4);
+});
+
+document.getElementById('back3v').addEventListener('click', () => showPage(3));
+
+document.getElementById('btnResend').addEventListener('click', async () => {
+  await sendVerificationCode();
+});
 
   function renderSummary() {
     const d = state.date;
@@ -600,7 +661,7 @@
   }
 
   // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbx1Yz9NHeaq73doNmi0IdYyLBOLE-RTps6t_u5Rr3kVtyv1ubcwqH8zRJv9DiHnPTIW/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbx7GVuqO6S9PpgWujAE2rm-UA0bXeqfMy4W0m5SbRxJz1dRg9P4_BWOctNzd9rJMLTA/exec';
 
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
@@ -688,6 +749,7 @@ function loadBookedSlots() {
       ig:           state.ig,
       email:        state.email || '',
       note:         state.note  || '',
+      verifyCode:   state.verifyCode || '',
     };
 
     try {
@@ -798,6 +860,8 @@ function loadBookedSlots() {
     document.getElementById('btn2').disabled = true;
     document.getElementById('agreeWrap').classList.remove('checked');
     document.getElementById('btnConfirm').disabled = true;
+    document.getElementById('fVerifyCode').value = '';
+state.verifyCode = '';
     showPage(1);
   }
  
