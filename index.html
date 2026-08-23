@@ -662,7 +662,7 @@ document.getElementById('btnResend').addEventListener('click', async () => {
   }
 
   // ▼ 請將部署後的 Google Apps Script 網址貼在這裡 ▼
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbx7GVuqO6S9PpgWujAE2rm-UA0bXeqfMy4W0m5SbRxJz1dRg9P4_BWOctNzd9rJMLTA/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzSuRF8QYfYrY_T1lYyiztivNFDFqxx9GpWMmSCvTqmRLNvKu4sARGShhSY3MKktsXM/exec';
 
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
@@ -866,9 +866,10 @@ state.verifyCode = '';
     showPage(1);
   }
  
-  loadBookedSlots().then(() => {
-    renderCalendar();
-  });
+  renderCalendar();
+loadBookedSlots().then(() => {
+  updateTimeSlots();
+});
 </script>
 </body>
 </html>
