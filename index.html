@@ -286,17 +286,17 @@
   const state = {
     date: null, slot: null, service: null, price: 0, dur: '',
     name: '', ig: '', email: '', note: '',
-    calYear: 2026, calMonth: 7  // 從 2026年7月開始（month index 5）
+    calYear: 2026, calMonth: 8  // 從 2026年7月開始（month index 5）
   };
 
   // 可預約日期：key = "YYYY-M"（月份 1-based）
   const AVAILABLE = {
-    '2026-7': [4, 5, 11, 12, 18, 19, 25, 26],
     '2026-8': [1, 2, 8, 9, 15, 16, 22, 23, 29, 30],
+    '2026-9': [5, 6, 19, 20],
   };
 
-  const MIN_YEAR = 2026, MIN_MONTH = 6;  // 7月
-  const MAX_YEAR = 2026, MAX_MONTH = 7;  // 8月
+  const MIN_YEAR = 2026, MIN_MONTH = 7;  // 8月
+  const MAX_YEAR = 2026, MAX_MONTH = 8;  // 9月
 
   const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
   // 星期一到日
