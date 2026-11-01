@@ -39,7 +39,7 @@
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-dow { text-align: center; font-size: 10px; color: #aaa; letter-spacing: 0.08em; padding: 4px 0 8px; }
     .cal-dow.weekend { color: #f97279; }
-    .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: default; transition: all 0.2s; color: #2a2a2a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+    .cal-day { text-align: center; font-size: 13px; border-radius: 50%; cursor: default; transition: all 0.2s; color: #2a2a2a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative; border: none; background: none; font-family: inherit; font-weight: inherit; padding: 0; }
     .cal-day.weekend { color: #f97279; }
     .cal-day.available { cursor: pointer; }
     .cal-day.available:hover { background: #dceef7; }
@@ -54,7 +54,7 @@
     .cal-day.available.selected::before { background: rgba(255,255,255,0.6); }
 
     .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .time-slot { border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; }
+    .time-slot { border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 14px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; color: #666; background: #fff; font-family: inherit; font-weight: inherit; }
     .time-slot:hover { border-color: #f97279; color: #f97279; }
     .time-slot.selected { background: #c6d8e6; border-color: #c6d8e6; color: #fff; }
     .time-slot.booked { background: #f5f5f5; border-color: #e8e8e8; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
@@ -64,6 +64,13 @@
     .slot-status { font-size: 12px; color: #aaa; margin-top: 8px; min-height: 1em; }
     .slot-retry { color: #f97279; cursor: pointer; margin-left: 6px; text-decoration: underline; }
     .cal-hint { font-size: 12px; color: #aaa; margin-top: 8px; }
+    .form-error { font-size: 12px; color: #f97279; line-height: 1.6; margin-bottom: 0.75rem; }
+    .form-error:empty { display: none; }
+    .field-error { font-size: 12px; color: #f97279; margin-top: 6px; }
+    .field-error:empty { display: none; }
+    .form-input.invalid { border-color: #f97279; }
+    .custom-notice { font-size: 12px; color: #666; line-height: 1.7; padding: 10px 14px; background: #fff8f8; border-left: 2px solid #f97279; border-radius: 8px; }
+    .cal-day:focus-visible, .time-slot:focus-visible, .sub-item:focus-visible, .agree-wrap:focus-visible, .verify-resend:focus-visible { outline: 2px solid #f97279; outline-offset: 2px; }
     
     /* Service blocks */
     .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
@@ -71,7 +78,7 @@
     .svc-block-title { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; color: #5a9ab5; text-transform: uppercase; }
     .svc-block-selected { font-size: 12px; color: #f97279; }
     .svc-block-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-    .sub-item { display: flex; align-items: center; justify-content: space-between; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; background: #fff; }
+    .sub-item { display: flex; align-items: center; justify-content: space-between; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; background: #fff; width: 100%; font-family: inherit; font-weight: inherit; text-align: left; }
     .sub-item:hover { border-color: #f97279; }
     .sub-item.selected { border: 1.5px solid #c6d8e6; background: #e8f1f6; }
     .sub-item-name { font-size: 13px; color: #2a2a2a; }
@@ -103,8 +110,9 @@
     .verify-input:focus { outline: none; border-color: #f97279; }
     .verify-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
     .verify-error { font-size: 12px; color: #f97279; margin-top: 8px; min-height: 1em; }
-    .verify-resend { font-size: 12px; color: #c6d8e6; cursor: pointer; margin-top: 12px; display: inline-block; }
-    .verify-resend:hover { color: #f97279; }
+    .verify-resend { font-size: 12px; color: #7aaac0; cursor: pointer; margin-top: 12px; display: inline-block; background: none; border: none; font-family: inherit; padding: 4px; }
+    .verify-resend:hover:not(:disabled) { color: #f97279; }
+    .verify-resend:disabled { color: #bbb; cursor: default; }
 
     .success-screen { text-align: center; padding: 2rem 1rem; display: none; }
     .form-notice { font-size: 11px; color: #aaa; letter-spacing: 0.04em; line-height: 1.7; margin-bottom:1.25rem; padding: 10px 14px; background: #c6d8e6; border-radius: 8px; border-left: 2px solid #B0A0C8;}
@@ -170,13 +178,14 @@
         <div class="time-section">
           <div class="block-label">時段</div>
           <div class="time-grid">
-            <div class="time-slot" data-slot="10:00">10:00</div>
-            <div class="time-slot" data-slot="14:00">14:00</div>
-            <div class="time-slot" data-slot="18:00">18:00</div>
+            <button type="button" class="time-slot" data-slot="10:00" aria-pressed="false">10:00</button>
+            <button type="button" class="time-slot" data-slot="14:00" aria-pressed="false">14:00</button>
+            <button type="button" class="time-slot" data-slot="18:00" aria-pressed="false">18:00</button>
           </div>
-          <p class="slot-status" id="slotStatus"></p>
+          <p class="slot-status" id="slotStatus" aria-live="polite"></p>
         </div>
       </div>
+      <p class="form-error" id="err1" role="alert"></p>
       <button class="btn-primary" id="btn1" disabled>下一步 — 選擇服務</button>
     </div>
 
@@ -211,22 +220,26 @@
       <div class="section-title">填寫個人資料</div>
       <p class="form-notice">所有資料作為工作室顧客聯絡及資料管理使用，不另作推銷與其他用途。</p>
       <div class="form-group">
-        <label class="form-label">如何稱呼</label>
-        <input class="form-input" type="text" placeholder="姓名或暱稱皆可" id="fName">
+        <label class="form-label" for="fName">如何稱呼</label>
+        <input class="form-input" type="text" placeholder="姓名或暱稱皆可" id="fName" aria-describedby="errName">
+        <p class="field-error" id="errName"></p>
       </div>
       <div class="form-group">
-        <label class="form-label">IG 帳號（即時聯絡用）</label>
-        <input class="form-input" type="text" placeholder="" id="fIG">
+        <label class="form-label" for="fIG">IG 帳號（即時聯絡用）</label>
+        <input class="form-input" type="text" placeholder="" id="fIG" aria-describedby="errIG">
+        <p class="field-error" id="errIG"></p>
       </div>
       <div class="form-group">
-  <label class="form-label">電子郵件</label>
-  <input class="form-input" type="email" placeholder="" id="fEmail">
+  <label class="form-label" for="fEmail">電子郵件</label>
+  <input class="form-input" type="email" placeholder="" id="fEmail" aria-describedby="errEmail">
+  <p class="field-error" id="errEmail"></p>
   <p style="font-size:11px; color:#aaa; margin-top:6px; line-height:1.6;">預約確認及相關通知將寄送至此信箱，請務必填寫正確。</p>
 </div>
       <div class="form-group">
-        <label class="form-label">備註（選填）</label>
-        <textarea class="form-input" rows="5" id="fNote" style="resize:none;" placeholder="素材以工作室現場為主，如有欲施作款式請務必於預約日三天前傳圖詢問。&#10;恕不接受精密手繪、版權物（例：三麗鷗、吉伊卡哇、吉卜力工作室...等）繪製。"></textarea>
+        <label class="form-label" for="fNote">備註（選填）</label>
+        <textarea class="form-input" rows="5" id="fNote" style="resize:none;" placeholder="素材以工作室現場為主，其他想告訴我們的事可以寫在這裡。"></textarea>
       </div>
+      <p class="form-error" id="err3" role="alert"></p>
       <button class="btn-primary" id="btn3">下一步 — 確認預約</button>
       <button class="btn-secondary" id="back2">返回上一步</button>
     </div>
@@ -236,10 +249,10 @@
   <div class="section-title">驗證電子郵件</div>
   <p class="form-notice">驗證碼已寄送至 <span id="verifyEmailHint" style="color:#5a9ab5;"></span>，請於 10 分鐘內輸入。</p>
   <div class="verify-wrap">
-    <input class="verify-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" id="fVerifyCode">
-    <p class="verify-error" id="verifyError"></p>
+    <input class="verify-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" id="fVerifyCode" aria-label="六位數驗證碼" autocomplete="one-time-code">
+    <p class="verify-error" id="verifyError" role="alert"></p>
     <p class="verify-hint">若未收到信件，請確認垃圾郵件資料夾。</p>
-    <span class="verify-resend" id="btnResend">重新發送驗證碼</span>
+    <button type="button" class="verify-resend" id="btnResend">重新發送驗證碼</button>
   </div>
   <button class="btn-primary" id="btn3v" style="margin-top:1.5rem;">驗證並繼續</button>
   <button class="btn-secondary" id="back3v">返回修改資料</button>
@@ -262,10 +275,11 @@
           <p>🌝 我方保有所有規則最終解釋權。</p>
         </div>
       </div>
-      <div class="agree-wrap" id="agreeWrap">
+      <div class="agree-wrap" id="agreeWrap" role="checkbox" aria-checked="false" tabindex="0">
         <div class="agree-circle"><span class="agree-check">✓</span></div>
         <span class="agree-text">我已閱讀並同意以上預約須知</span>
       </div>
+      <p class="form-error" id="err4" role="alert"></p>
       <button class="btn-primary" id="btnConfirm" disabled>確認預約</button>
       <button class="btn-secondary" id="back3">返回修改</button>
     </div>
@@ -273,8 +287,8 @@
     <!-- Success -->
     <div class="success-screen" id="successPage">
       <div class="success-icon">🌸</div>
-      <div class="success-title">預約成功！</div>
-      <div class="success-sub">感謝您預約 nyorong nail 嬉希工作室。<br>我們將盡快與您確認。</div>
+      <div class="success-title">已收到您的預約</div>
+      <div class="success-sub">我們會在 24 小時內透過 IG 私訊與您確認時段，<br>收到您的回覆後，預約才算正式成立。<br>請留意 IG陌生訊息🤍</div>
       <div class="cal-label">加入行事曆</div>
       <div class="cal-btn-wrap">
         <button class="btn-cal" id="btnGoogleCal">
@@ -416,9 +430,11 @@
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
-      const el = document.createElement('div');
+      const el = document.createElement('button');
+      el.type = 'button';
       el.className = 'cal-day';
       el.textContent = d;
+      el.dataset.day = d;
  
       const thisDate = new Date(calYear, calMonth, d);
       const jsDay = thisDate.getDay(); // 0=Sun, 6=Sat
@@ -436,21 +452,31 @@
       const isPast = thisDate < earliestBookable();
       const available = isAvailable(calYear, calMonth, d);
  
+      const label = (calMonth + 1) + ' 月 ' + d + ' 日';
       if (isPast) {
         el.classList.add('past');
+        el.disabled = true;
+        el.setAttribute('aria-label', label + '，不開放預約');
       } else if (available) {
         el.classList.add('available');
-        if (state.date && state.date.toDateString() === thisDate.toDateString()) {
-          el.classList.add('selected');
-        }
+        const isSelected = !!state.date && state.date.toDateString() === thisDate.toDateString();
+        if (isSelected) el.classList.add('selected');
+        el.setAttribute('aria-pressed', isSelected);
+        el.setAttribute('aria-label', label + '，可預約');
         el.addEventListener('click', () => {
           state.date = thisDate;
+          showError('err1', '');
           renderCalendar();
+          // 日曆重畫後焦點會不見，鍵盤操作時把焦點放回剛選的日期
+          const again = grid.querySelector('[data-day="' + d + '"]');
+          if (again) again.focus();
           checkPage1();
           updateTimeSlots();
         });
       } else {
         el.classList.add('disabled');
+        el.disabled = true;
+        el.setAttribute('aria-label', label + '，不開放預約');
       }
  
       grid.appendChild(el);
@@ -473,9 +499,14 @@
   document.querySelectorAll('.time-slot').forEach(el => {
     el.addEventListener('click', () => {
       if (el.classList.contains('booked') || el.classList.contains('locked')) return;
-      document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
+      document.querySelectorAll('.time-slot').forEach(x => {
+        x.classList.remove('selected');
+        x.setAttribute('aria-pressed', 'false');
+      });
       el.classList.add('selected');
+      el.setAttribute('aria-pressed', 'true');
       state.slot = el.dataset.slot;
+      showError('err1', '');
       checkPage1();
     });
   });
@@ -485,17 +516,31 @@
   document.getElementById('back2').addEventListener('click', () => showPage(2));
   document.getElementById('back3').addEventListener('click', () => {
     // reset agree when going back
-    document.getElementById('agreeWrap').classList.remove('checked');
-    document.getElementById('btnConfirm').disabled = true;
+    setAgree(false);
+    showError('err4', '');
     showPage(3);
   });
 
+  // 錯誤訊息顯示在頁面上，不用 alert 彈窗；msg 為空字串時清除
+  function showError(id, msg) {
+    document.getElementById(id).textContent = msg;
+  }
+
   // ── 預約須知同意 ───────────────────────────────────
-  document.getElementById('agreeWrap').addEventListener('click', () => {
+  function setAgree(checked) {
     const wrap = document.getElementById('agreeWrap');
-    const btn = document.getElementById('btnConfirm');
-    wrap.classList.toggle('checked');
-    btn.disabled = !wrap.classList.contains('checked');
+    wrap.classList.toggle('checked', checked);
+    wrap.setAttribute('aria-checked', checked);
+    document.getElementById('btnConfirm').disabled = !checked;
+  }
+
+  const agreeWrap = document.getElementById('agreeWrap');
+  agreeWrap.addEventListener('click', () => setAgree(!agreeWrap.classList.contains('checked')));
+  agreeWrap.addEventListener('keydown', e => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      setAgree(!agreeWrap.classList.contains('checked'));
+    }
   });
  
   // ── Service data ──────────────────────────────────────────────
@@ -548,11 +593,21 @@
     const selectedItem = data.items.find(i => i.name === svcState[cat].item);
     const showAddon = selectedItem && selectedItem.showAddon;
 
+    // 重畫後把焦點放回剛點的選項，鍵盤操作才不會跳回頁首
+    const refocus = name => {
+      const again = [...body.children].find(b => b.dataset.name === name);
+      if (again) again.focus();
+    };
+
     // Main items
    data.items.forEach(item => {
-      const el = document.createElement('div');
+      const el = document.createElement('button');
+      el.type = 'button';
       el.className = 'sub-item';
-      if (svcState[cat].item === item.name) el.classList.add('selected');
+      el.dataset.name = item.name;
+      const isSelected = svcState[cat].item === item.name;
+      if (isSelected) el.classList.add('selected');
+      el.setAttribute('aria-pressed', isSelected);
       let priceStr;
       if (item.price === null) priceStr = '另計';
       else if (item.price === 0) priceStr = 'NT$0';
@@ -566,16 +621,27 @@
           svcState[cat].addonPrice = 0;
         }
         renderBlock(cat);
+        refocus(item.name);
         if (cat === '卸甲') {
           const locked = !!item.disablesGel;
           document.getElementById('block-凝膠').style.display = locked ? 'none' : '';
           if (locked) {
             svcState['凝膠'] = { item: null, addon: null, itemPrice: 0, addonPrice: 0 };
+            renderBlock('凝膠');
           }
         }
         checkPage2();
       });
       body.appendChild(el);
+
+      // 選客製化時，直接在選項下方顯示傳圖與繪製限制
+      if (isSelected && item.name === '客製化造型設計') {
+        const notice = document.createElement('div');
+        notice.className = 'custom-notice';
+        notice.innerHTML = '1. 如有欲施作款式請於預約成功後以IG訊息傳圖詢問。<br>' +
+          '2. 恕不接受精密手繪、版權物（例：三麗鷗、吉伊卡哇、吉卜力工作室等）';
+        body.appendChild(notice);
+      }
     });
     
      // Addons：只在 showAddon 的選項被選中時顯示
@@ -585,14 +651,19 @@
       lbl.textContent = '加購項目（選填）';
       body.appendChild(lbl);
       data.addons.forEach(addon => {
-        const el = document.createElement('div');
+        const el = document.createElement('button');
+        el.type = 'button';
         el.className = 'sub-item addon';
-        if (svcState[cat].addon === addon.name) el.classList.add('selected');
+        el.dataset.name = addon.name;
+        const isSelected = svcState[cat].addon === addon.name;
+        if (isSelected) el.classList.add('selected');
+        el.setAttribute('aria-pressed', isSelected);
         el.innerHTML = `<span class="sub-item-name">${addon.name}</span><span class="sub-item-price">+NT$${addon.price.toLocaleString()}</span>`;
         el.addEventListener('click', () => {
           svcState[cat].addon = (svcState[cat].addon === addon.name) ? null : addon.name;
           svcState[cat].addonPrice = svcState[cat].addon ? addon.price : 0;
           renderBlock(cat);
+          refocus(addon.name);
         });
         body.appendChild(el);
       });
@@ -637,10 +708,45 @@
     if (svcState['卸甲'].item !== null && gelOk) showPage(3);
   });
 
+  const RESEND_COOLDOWN = 60;  // 秒，需與 Apps Script 的 VERIFY_COOLDOWN 一致
+  const VERIFY_TTL = 600;      // 秒，需與 Apps Script 的 VERIFY_TTL 一致
+  let resendTimer = null;
+
+  // 依上次寄出時間倒數，倒數結束前不能重新發送
+  function startResendCooldown() {
+    const btn = document.getElementById('btnResend');
+    clearInterval(resendTimer);
+    const tick = () => {
+      const left = RESEND_COOLDOWN - Math.floor((Date.now() - state.codeSentAt) / 1000);
+      if (left > 0) {
+        btn.disabled = true;
+        btn.textContent = '重新發送驗證碼（' + left + ' 秒）';
+      } else {
+        clearInterval(resendTimer);
+        btn.disabled = false;
+        btn.textContent = '重新發送驗證碼';
+      }
+    };
+    tick();
+    resendTimer = setInterval(tick, 1000);
+  }
+
+  function showVerifyPage() {
+    document.getElementById('verifyEmailHint').textContent = state.email;
+    showPage('3v');
+    startResendCooldown();
+  }
+
   async function sendVerificationCode() {
-  const btn = document.getElementById('btn3');
+  // 從資料頁按「下一步」或在驗證頁按「重新發送」都會呼叫，錯誤顯示在當下那一頁
+  const fromVerifyPage = document.getElementById('page3v').classList.contains('active');
+  const showErr = msg => fromVerifyPage ? showVerifyError(msg) : showError('err3', msg);
+  const btn = document.getElementById(fromVerifyPage ? 'btnResend' : 'btn3');
+  const label = btn.textContent;
   btn.disabled = true;
   btn.textContent = '寄送中…';
+  showErr('');
+  let sent = false;
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
@@ -648,33 +754,67 @@
     });
     const result = await res.json();
     if (result.success) {
-      document.getElementById('verifyEmailHint').textContent = state.email;
-      showVerifyError('');
-      showPage('3v');
+      state.codeSentAt = Date.now();
+      state.codeSentTo = state.email;
+      sent = true;
+      showVerifyPage();
     } else if (result.code === 'COOLDOWN') {
       // 一分鐘內已寄過，信中的驗證碼仍有效，直接讓客人輸入
-      document.getElementById('verifyEmailHint').textContent = state.email;
-      showPage('3v');
+      if (state.codeSentTo !== state.email) {
+        state.codeSentAt = Date.now();
+        state.codeSentTo = state.email;
+      }
+      sent = true;
+      showVerifyPage();
       showVerifyError(result.error);
     } else {
-      alert(result.error || '驗證碼寄送失敗，請稍後再試。');
+      showErr(result.error || '驗證碼寄送失敗，請稍後再試。');
     }
   } catch (err) {
-    alert('網路錯誤，請確認連線後再試。');
+    showErr('網路錯誤，請確認連線後再試。');
   }
-  btn.disabled = false;
-  btn.textContent = '下一步 — 確認預約';
+  // 重新發送成功時按鈕交給倒數控制，其他情況恢復原狀
+  if (!(fromVerifyPage && sent)) {
+    btn.disabled = false;
+    btn.textContent = fromVerifyPage ? '重新發送驗證碼' : label;
+  }
 }
+
+  const FIELDS = [
+    { id: 'fName',  err: 'errName' },
+    { id: 'fIG',    err: 'errIG' },
+    { id: 'fEmail', err: 'errEmail' },
+  ];
+
+  function setFieldError(field, msg) {
+    const input = document.getElementById(field.id);
+    input.classList.toggle('invalid', !!msg);
+    input.setAttribute('aria-invalid', !!msg);
+    document.getElementById(field.err).textContent = msg;
+  }
+
+  // 開始修改欄位時就清掉該欄的錯誤
+  FIELDS.forEach(f => {
+    document.getElementById(f.id).addEventListener('input', () => setFieldError(f, ''));
+  });
 
 document.getElementById('btn3').addEventListener('click', async () => {
   const n = document.getElementById('fName').value.trim();
   const ig = document.getElementById('fIG').value.trim();
   const email = document.getElementById('fEmail').value.trim();
-  if (!n) { alert('請填寫稱呼'); return; }
-  if (!ig) { alert('請填寫 IG 帳號'); return; }
-  if (!email) { alert('請填寫電子郵件'); return; }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) { alert('電子郵件格式不正確，請確認後再試。'); return; }
+  const messages = [
+    n ? '' : '請填寫稱呼',
+    ig ? '' : '請填寫 IG 帳號',
+    !email ? '請填寫電子郵件' : (emailRegex.test(email) ? '' : '電子郵件格式不正確，請確認後再試。'),
+  ];
+  messages.forEach((msg, i) => setFieldError(FIELDS[i], msg));
+  const firstInvalid = messages.findIndex(Boolean);
+  if (firstInvalid !== -1) {
+    document.getElementById(FIELDS[firstInvalid].id).focus();
+    return;
+  }
+  showError('err3', '');
   state.name = n; state.ig = ig;
   state.email = email;
   state.note = document.getElementById('fNote').value;
@@ -682,6 +822,12 @@ document.getElementById('btn3').addEventListener('click', async () => {
   if (state.email === state.verifiedEmail) {
     renderSummary();
     showPage(4);
+    return;
+  }
+  // 驗證碼已寄到同一個信箱且還沒過期，直接回到輸入驗證碼的頁面，不重寄
+  if (state.email === state.codeSentTo && Date.now() - state.codeSentAt < VERIFY_TTL * 1000) {
+    showVerifyError('');
+    showVerifyPage();
     return;
   }
   await sendVerificationCode();
@@ -852,17 +998,17 @@ document.getElementById('btnResend').addEventListener('click', async () => {
     const locked = bookedStatus !== 'ok' || !state.date;
     document.querySelectorAll('.time-slot').forEach(el => {
       const slot = el.dataset.slot;
+      const taken = !locked && (isSlotBooked(state.date, slot) || isSlotPast(state.date));
       el.classList.toggle('locked', locked);
-      if (locked || isSlotBooked(state.date, slot) || isSlotPast(state.date)) {
-        if (!locked) el.classList.add('booked');
+      el.classList.toggle('booked', taken);
+      el.disabled = locked || taken;
+      if (locked || taken) {
         el.classList.remove('selected');
+        el.setAttribute('aria-pressed', 'false');
         if (state.slot === slot) {
           state.slot = null;
           checkPage1();
         }
-      }
-      if (locked || !(isSlotBooked(state.date, slot) || isSlotPast(state.date))) {
-        el.classList.remove('booked');
       }
     });
     renderSlotStatus();
@@ -872,24 +1018,23 @@ document.getElementById('btnResend').addEventListener('click', async () => {
     const btn = document.getElementById('btnConfirm');
     btn.disabled = true;
     btn.textContent = '確認時段中…';
+    showError('err4', '');
 
     // 送出前再抓一次已約時段，避免填資料期間被別人約走
     const loaded = await loadBookedSlots();
     if (!loaded) {
-      alert('目前無法確認時段是否仍可預約，請確認連線後再試。');
+      showError('err4', '目前無法確認時段是否仍可預約，請確認連線後再試。');
       btn.disabled = false;
       btn.textContent = '確認預約';
       return;
     }
     if (isSlotBooked(state.date, state.slot)) {
-      alert('很抱歉，這個時段剛剛已被預約，請重新選擇時段。');
-      btn.disabled = false;
       btn.textContent = '確認預約';
-      document.getElementById('agreeWrap').classList.remove('checked');
-      btn.disabled = true;
+      setAgree(false);
       bookedStatus = 'ok';
       updateTimeSlots();
       showPage(1);
+      showError('err1', '很抱歉，這個時段剛剛已被預約，請重新選擇時段。');
       return;
     }
     btn.textContent = '送出中…';
@@ -919,92 +1064,118 @@ document.getElementById('btnResend').addEventListener('click', async () => {
       const result = await res.json();
 
      if (result.code === 'SLOT_TAKEN') {
-        alert(result.error);
         btn.textContent = '確認預約';
-        document.getElementById('agreeWrap').classList.remove('checked');
+        setAgree(false);
         await refreshBookedSlots();
         showPage(1);
+        showError('err1', result.error);
       } else if (result.success) {
         setupCalendarButtons();
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('successPage').style.display = 'block';
         updateSteps(5);
+        window.scrollTo(0, 0);
+      } else if ((result.error || '').includes('驗證碼')) {
+        // 驗證碼過期時要重新驗證：清掉紀錄，返回修改後按下一步會重寄
+        state.verifiedEmail = '';
+        state.codeSentTo = '';
+        showError('err4', result.error + '請按「返回修改」重新驗證信箱。');
+        btn.disabled = false;
+        btn.textContent = '確認預約';
       } else {
-        // 驗證碼過期時要重新驗證
-        if ((result.error || '').includes('驗證碼')) state.verifiedEmail = '';
-        alert('送出失敗，請稍後再試。\n（' + (result.error || '未知錯誤') + '）');
+        showError('err4', '送出失敗，請稍後再試。（' + (result.error || '未知錯誤') + '）');
         btn.disabled = false;
         btn.textContent = '確認預約';
       }
     } catch (err) {
-      alert('網路錯誤，請確認連線後再試。');
+      showError('err4', '網路錯誤，請確認連線後再試。');
       btn.disabled = false;
       btn.textContent = '確認預約';
     }
   });
 
   // ── 行事曆按鈕 ────────────────────────────────────
-  function parseBookingDateTime(dateStr, slotStr, durationMin) {
-    const dp = dateStr.match(/(\d+)\s*年\s*(\d+)\s*月\s*(\d+)\s*日/);
-    const tp = slotStr.match(/(\d+):(\d+)/);
-    if (!dp || !tp) return null;
-    const start = new Date(
-      parseInt(dp[1]),
-      parseInt(dp[2]) - 1,
-      parseInt(dp[3]),
-      parseInt(tp[1]),
-      parseInt(tp[2])
-    );
-    const end = new Date(start.getTime() + (durationMin || 120) * 60000);
+  const STUDIO_ADDRESS = '台北市民權東路三段106巷1號2樓';
+  const STUDIO_MAP_URL = 'https://maps.app.goo.gl/AAYUri9MujaofBVw5';
+  const BOOKING_MINUTES = 180;
+
+  // 預約時段一律是台灣時間（UTC+8）。轉成 UTC，客人手機設在其他時區也不會跑掉
+  function bookingTimesUTC() {
+    const d = state.date;
+    const [h, m] = state.slot.split(':').map(Number);
+    const start = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), h - 8, m));
+    const end = new Date(start.getTime() + BOOKING_MINUTES * 60000);
     return { start, end };
   }
- 
-  function toICSDate(dt) {
-    const pad = n => String(n).padStart(2, '0');
-    return dt.getFullYear() + pad(dt.getMonth()+1) + pad(dt.getDate()) +
-           'T' + pad(dt.getHours()) + pad(dt.getMinutes()) + '00';
+
+  // 20261108T020000Z 格式，Google 日曆與 .ics 共用
+  function toUTCStamp(dt) {
+    return dt.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   }
- 
-  function toGoogleDate(dt) {
-    const pad = n => String(n).padStart(2, '0');
-    return dt.getFullYear() + pad(dt.getMonth()+1) + pad(dt.getDate()) +
-           'T' + pad(dt.getHours()) + pad(dt.getMinutes()) + '00';
+
+  // .ics 文字欄位要跳脫 \ ; , 與換行
+  function escapeICS(text) {
+    return text.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
   }
- 
+
+  // .ics 每行不得超過 75 bytes，超過要換行並以空白開頭接續（中文一字 3 bytes）
+  function foldICSLine(line) {
+    const encoder = new TextEncoder();
+    const lines = [];
+    let current = '', bytes = 0;
+    for (const ch of line) {
+      const size = encoder.encode(ch).length;
+      if (bytes + size > (lines.length ? 74 : 75)) {
+        lines.push(current);
+        current = '';
+        bytes = 0;
+      }
+      current += ch;
+      bytes += size;
+    }
+    lines.push(current);
+    return lines.join('\r\n ');
+  }
+
   function setupCalendarButtons() {
-    const d = state.date;
-    const dateStr = d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日';
-    const times = parseBookingDateTime(dateStr, state.slot, 180);
-    if (!times) return;
- 
-    const title = encodeURIComponent('nyorong nail 嬉希工作室 美甲預約');
-    const details = encodeURIComponent(
+    const times = bookingTimesUTC();
+    const title = 'nyorong nail 嬉希工作室 美甲預約';
+    const details =
       '卸甲：' + svcState['卸甲'].item +
       (svcState['卸甲'].addon ? ' ＋' + svcState['卸甲'].addon : '') + '\n' +
       '凝膠：' + (svcState['凝膠'].item || '無') +
-      (svcState['凝膠'].addon ? ' ＋' + svcState['凝膠'].addon : '')
-    );
- 
+      (svcState['凝膠'].addon ? ' ＋' + svcState['凝膠'].addon : '') + '\n' +
+      '地圖：' + STUDIO_MAP_URL;
+
     // Google 日曆
     const googleUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-      '&text=' + title +
-      '&dates=' + toGoogleDate(times.start) + '/' + toGoogleDate(times.end) +
-      '&details=' + details;
+      '&text=' + encodeURIComponent(title) +
+      '&dates=' + toUTCStamp(times.start) + '/' + toUTCStamp(times.end) +
+      '&ctz=Asia/Taipei' +
+      '&location=' + encodeURIComponent(STUDIO_ADDRESS) +
+      '&details=' + encodeURIComponent(details);
     document.getElementById('btnGoogleCal').onclick = () => window.open(googleUrl, '_blank');
- 
+
     // Apple / ICS 下載
+    const uid = Date.now() + '-' + Math.random().toString(36).slice(2) + '@nyorong-living.github.io';
     const icsContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//nyorong nail//reservation//ZH',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
       'BEGIN:VEVENT',
-      'DTSTART:' + toICSDate(times.start),
-      'DTEND:'   + toICSDate(times.end),
-      'SUMMARY:nyorong nail 嬉希工作室 美甲預約',
-      'DESCRIPTION:' + decodeURIComponent(details).replace(/\n/g, '\\n'),
+      'UID:' + uid,
+      'DTSTAMP:' + toUTCStamp(new Date()),
+      'DTSTART:' + toUTCStamp(times.start),
+      'DTEND:'   + toUTCStamp(times.end),
+      'SUMMARY:' + escapeICS(title),
+      'LOCATION:' + escapeICS(STUDIO_ADDRESS),
+      'URL:' + STUDIO_MAP_URL,
+      'DESCRIPTION:' + escapeICS(details),
       'END:VEVENT',
       'END:VCALENDAR'
-    ].join('\r\n');
+    ].map(foldICSLine).join('\r\n') + '\r\n';
  
     document.getElementById('btnAppleCal').onclick = () => {
       const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
@@ -1021,15 +1192,21 @@ document.getElementById('btnResend').addEventListener('click', async () => {
     state.name = ''; state.ig = ''; state.email = ''; state.note = '';
     goToOpeningMonth();
     ['卸甲','凝膠'].forEach(cat => { svcState[cat] = { item: null, addon: null, itemPrice: 0, addonPrice: 0 }; });
-    document.querySelectorAll('.time-slot').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.time-slot').forEach(c => {
+      c.classList.remove('selected');
+      c.setAttribute('aria-pressed', 'false');
+    });
     initBlocks();
     ['fName','fIG','fEmail','fNote'].forEach(id => document.getElementById(id).value = '');
+    FIELDS.forEach(f => setFieldError(f, ''));
+    ['err1', 'err3', 'err4'].forEach(id => showError(id, ''));
     document.getElementById('btn2').disabled = true;
-    document.getElementById('agreeWrap').classList.remove('checked');
-    document.getElementById('btnConfirm').disabled = true;
+    setAgree(false);
+    document.getElementById('btnConfirm').textContent = '確認預約';
     document.getElementById('fVerifyCode').value = '';
 state.verifyCode = '';
     state.verifiedEmail = '';
+    state.codeSentTo = '';
     document.getElementById('block-凝膠').style.display = '';
     checkPage1();
     renderCalendar();
