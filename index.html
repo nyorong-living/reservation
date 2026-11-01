@@ -59,6 +59,11 @@
     .time-slot.selected { background: #c6d8e6; border-color: #c6d8e6; color: #fff; }
     .time-slot.booked { background: #f5f5f5; border-color: #e8e8e8; color: #ccc; cursor: not-allowed; text-decoration: line-through; }
     .time-slot.booked:hover { border-color: #e8e8e8; color: #ccc; }
+    .time-slot.locked { opacity: 0.4; cursor: not-allowed; }
+    .time-slot.locked:hover { border-color: #c6d8e6; }
+    .slot-status { font-size: 12px; color: #aaa; margin-top: 8px; min-height: 1em; }
+    .slot-retry { color: #f97279; cursor: pointer; margin-left: 6px; text-decoration: underline; }
+    .cal-hint { font-size: 12px; color: #aaa; margin-top: 8px; }
     
     /* Service blocks */
     .svc-block { border: 0.5px solid #e0dce8; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; background: #fff; }
@@ -97,6 +102,7 @@
     .verify-input { width: 160px; text-align: center; font-size: 24px; letter-spacing: 0.3em; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 12px; font-family: 'Jost', sans-serif; color: #2a2a2a; }
     .verify-input:focus { outline: none; border-color: #f97279; }
     .verify-hint { font-size: 12px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+    .verify-error { font-size: 12px; color: #f97279; margin-top: 8px; min-height: 1em; }
     .verify-resend { font-size: 12px; color: #c6d8e6; cursor: pointer; margin-top: 12px; display: inline-block; }
     .verify-resend:hover { color: #f97279; }
 
@@ -159,6 +165,7 @@
             <button class="cal-nav" id="nextMonth">&#8250;</button>
           </div>
           <div class="cal-grid" id="calGrid"></div>
+          <p class="cal-hint">需於 2 天前預約</p>
         </div>
         <div class="time-section">
           <div class="block-label">時段</div>
@@ -167,6 +174,7 @@
             <div class="time-slot" data-slot="14:00">14:00</div>
             <div class="time-slot" data-slot="18:00">18:00</div>
           </div>
+          <p class="slot-status" id="slotStatus"></p>
         </div>
       </div>
       <button class="btn-primary" id="btn1" disabled>下一步 — 選擇服務</button>
@@ -229,6 +237,7 @@
   <p class="form-notice">驗證碼已寄送至 <span id="verifyEmailHint" style="color:#5a9ab5;"></span>，請於 10 分鐘內輸入。</p>
   <div class="verify-wrap">
     <input class="verify-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" id="fVerifyCode">
+    <p class="verify-error" id="verifyError"></p>
     <p class="verify-hint">若未收到信件，請確認垃圾郵件資料夾。</p>
     <span class="verify-resend" id="btnResend">重新發送驗證碼</span>
   </div>
@@ -286,18 +295,62 @@
   const state = {
     date: null, slot: null, service: null, price: 0, dur: '',
     name: '', ig: '', email: '', note: '',
-    calYear: 2026, calMonth: 9  // 從 2026年7月開始（month index 5）
+    calYear: 0, calMonth: 0  // 由 openingMonth() 決定
   };
 
   // 可預約日期：key = "YYYY-M"（月份 1-based）
+  // 實際以 Google Sheet「可預約日期」工作表為準，載入後會被覆蓋；
+  // 這份只在後端尚未回傳 available 時使用
   const AVAILABLE = {
     '2026-9': [5, 6, 19, 20],
     '2026-10': [3, 4, 10, 11, 17, 18, 24, 25, 26, 31],
     '2026-11': [1, 8, 14, 15, 21, 22, 28, 29],
   };
 
-  const MIN_YEAR = 2026, MIN_MONTH = 8;  // 9月
-  const MAX_YEAR = 2026, MAX_MONTH = 10;  // 11月
+  // 最短提前預約天數：今天 11/1 → 最早可約 11/3
+  const LEAD_DAYS = 2;
+
+  function earliestBookable() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + LEAD_DAYS);
+    return d;
+  }
+
+  // 月份索引 = 年 × 12 + month index（0-based），方便比較前後
+  const monthIndex = (year, month) => year * 12 + month;
+
+  // 可切換的月份範圍：從「本月」與 AVAILABLE 最早月份中較晚者，到 AVAILABLE 最晚月份
+  function monthRange() {
+    const keys = Object.keys(AVAILABLE).map(k => {
+      const [y, m] = k.split('-').map(Number);
+      return monthIndex(y, m - 1);
+    });
+    const now = new Date();
+    const thisMonth = monthIndex(now.getFullYear(), now.getMonth());
+    if (keys.length === 0) return { first: thisMonth, last: thisMonth };
+    const last = Math.max(...keys);
+    const first = Math.min(Math.max(thisMonth, Math.min(...keys)), last);
+    return { first, last };
+  }
+
+  // 日曆開啟時顯示的月份：第一個還有可約日期的月份
+  function openingMonth() {
+    const { first, last } = monthRange();
+    const earliest = earliestBookable();
+    for (let idx = first; idx <= last; idx++) {
+      const year = Math.floor(idx / 12), month = idx % 12;
+      const days = AVAILABLE[year + '-' + (month + 1)] || [];
+      if (days.some(d => new Date(year, month, d) >= earliest)) return { year, month };
+    }
+    return { year: Math.floor(last / 12), month: last % 12 };
+  }
+
+  function goToOpeningMonth() {
+    const { year, month } = openingMonth();
+    state.calYear = year;
+    state.calMonth = month;
+  }
 
   const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
   // 星期一到日
@@ -336,8 +389,10 @@
 
     const prevBtn = document.getElementById('prevMonth');
     const nextBtn = document.getElementById('nextMonth');
-    prevBtn.disabled = (calYear === MIN_YEAR && calMonth === MIN_MONTH);
-    nextBtn.disabled = (calYear === MAX_YEAR && calMonth === MAX_MONTH);
+    const range = monthRange();
+    const current = monthIndex(calYear, calMonth);
+    prevBtn.disabled = current <= range.first;
+    nextBtn.disabled = current >= range.last;
 
     const grid = document.getElementById('calGrid');
     grid.innerHTML = '';
@@ -377,7 +432,8 @@
       const isToday = thisDate.toDateString() === today.toDateString();
       if (isToday) el.classList.add('today');
  
-      const isPast = thisDate < today;
+      // 今天起 LEAD_DAYS 天內不開放預約
+      const isPast = thisDate < earliestBookable();
       const available = isAvailable(calYear, calMonth, d);
  
       if (isPast) {
@@ -402,13 +458,13 @@
   }
 
   document.getElementById('prevMonth').addEventListener('click', () => {
-    if (state.calYear === MIN_YEAR && state.calMonth === MIN_MONTH) return;
+    if (monthIndex(state.calYear, state.calMonth) <= monthRange().first) return;
     state.calMonth--;
     if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
     renderCalendar();
   });
   document.getElementById('nextMonth').addEventListener('click', () => {
-    if (state.calYear === MAX_YEAR && state.calMonth === MAX_MONTH) return;
+    if (monthIndex(state.calYear, state.calMonth) >= monthRange().last) return;
     state.calMonth++;
     if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
     renderCalendar();
@@ -416,7 +472,7 @@
 
   document.querySelectorAll('.time-slot').forEach(el => {
     el.addEventListener('click', () => {
-      if (el.classList.contains('booked')) return;
+      if (el.classList.contains('booked') || el.classList.contains('locked')) return;
       document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
       el.classList.add('selected');
       state.slot = el.dataset.slot;
@@ -593,9 +649,15 @@
     const result = await res.json();
     if (result.success) {
       document.getElementById('verifyEmailHint').textContent = state.email;
+      showVerifyError('');
       showPage('3v');
+    } else if (result.code === 'COOLDOWN') {
+      // 一分鐘內已寄過，信中的驗證碼仍有效，直接讓客人輸入
+      document.getElementById('verifyEmailHint').textContent = state.email;
+      showPage('3v');
+      showVerifyError(result.error);
     } else {
-      alert('驗證碼寄送失敗，請稍後再試。');
+      alert(result.error || '驗證碼寄送失敗，請稍後再試。');
     }
   } catch (err) {
     alert('網路錯誤，請確認連線後再試。');
@@ -616,15 +678,46 @@ document.getElementById('btn3').addEventListener('click', async () => {
   state.name = n; state.ig = ig;
   state.email = email;
   state.note = document.getElementById('fNote').value;
+  // 同一個信箱已經驗證過，返回修改資料後不用再驗證一次
+  if (state.email === state.verifiedEmail) {
+    renderSummary();
+    showPage(4);
+    return;
+  }
   await sendVerificationCode();
 });
 
-document.getElementById('btn3v').addEventListener('click', () => {
+function showVerifyError(msg) {
+  document.getElementById('verifyError').textContent = msg;
+}
+
+// 驗證碼在這一步就交給後端確認，錯誤時不必等到最後送出才知道
+document.getElementById('btn3v').addEventListener('click', async () => {
   const code = document.getElementById('fVerifyCode').value.trim();
-  if (code.length !== 6) { alert('請輸入六位數驗證碼'); return; }
-  state.verifyCode = code;
-  renderSummary();
-  showPage(4);
+  if (!/^\d{6}$/.test(code)) { showVerifyError('請輸入六位數驗證碼'); return; }
+  const btn = document.getElementById('btn3v');
+  btn.disabled = true;
+  btn.textContent = '驗證中…';
+  showVerifyError('');
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'checkVerification', email: state.email, code }),
+    });
+    const result = await res.json();
+    if (result.success) {
+      state.verifyCode = code;
+      state.verifiedEmail = state.email;
+      renderSummary();
+      showPage(4);
+    } else {
+      showVerifyError(result.error || '驗證碼錯誤或已過期，請重新輸入或重新發送。');
+    }
+  } catch (err) {
+    showVerifyError('網路錯誤，請確認連線後再試。');
+  }
+  btn.disabled = false;
+  btn.textContent = '驗證並繼續';
 });
 
 document.getElementById('back3v').addEventListener('click', () => showPage(3));
@@ -639,7 +732,7 @@ document.getElementById('btnResend').addEventListener('click', async () => {
 
     const cats = ['卸甲','凝膠'];
     const serviceRows = cats.map(cat => {
-  let val = svcState[cat].item;
+  let val = svcState[cat].item || '無';
       if (svcState[cat].addon) val += '　＋' + svcState[cat].addon;
       return [cat, val];
     });
@@ -667,35 +760,80 @@ document.getElementById('btnResend').addEventListener('click', async () => {
 
   // ── 已預約時段 ─────────────────────────────────────
   let bookedSlots = {};
+  let bookedStatus = 'loading';  // loading | ok | error
 
-function loadBookedSlots() {
+  // 成功時回傳 true；逾時或失敗回傳 false，不更新 bookedSlots
+  function loadBookedSlots() {
     return new Promise((resolve) => {
       const callbackName = '_gasCallback_' + Date.now();
       const script = document.createElement('script');
-      const timeout = setTimeout(() => {
-        delete window[callbackName];
-        if (script.parentNode) document.body.removeChild(script);
-        console.warn('無法載入已預約時段：請求逾時');
-        resolve();
-      }, 5000);
- 
-      window[callbackName] = function(data) {
+      const cleanup = () => {
         clearTimeout(timeout);
         delete window[callbackName];
         if (script.parentNode) document.body.removeChild(script);
-        if (data && data.success) bookedSlots = data.booked;
-        resolve();
+      };
+      const timeout = setTimeout(() => {
+        cleanup();
+        console.warn('無法載入已預約時段：請求逾時');
+        resolve(false);
+      }, 8000);
+ 
+      window[callbackName] = function(data) {
+        cleanup();
+        if (data && data.success) {
+          bookedSlots = data.booked;
+          if (data.available) applyAvailable(data.available);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
       };
  
       script.src = GAS_URL + '?action=getBooked&callback=' + callbackName;
       script.onerror = () => {
-        clearTimeout(timeout);
-        delete window[callbackName];
+        cleanup();
         console.warn('無法載入已預約時段：載入失敗');
-        resolve();
+        resolve(false);
       };
       document.body.appendChild(script);
     });
+  }
+
+  // 用後端回傳的可預約日期取代預設值，並重新整理日曆
+  function applyAvailable(available) {
+    Object.keys(AVAILABLE).forEach(k => delete AVAILABLE[k]);
+    Object.assign(AVAILABLE, available);
+    if (state.date && !isAvailable(state.date.getFullYear(), state.date.getMonth(), state.date.getDate())) {
+      state.date = null;
+      state.slot = null;
+      checkPage1();
+    }
+    if (!state.date) goToOpeningMonth();
+    renderCalendar();
+  }
+
+  // 重新抓已約時段，並同步畫面上的時段狀態與提示
+  async function refreshBookedSlots() {
+    bookedStatus = 'loading';
+    updateTimeSlots();
+    const ok = await loadBookedSlots();
+    bookedStatus = ok ? 'ok' : 'error';
+    updateTimeSlots();
+    return ok;
+  }
+
+  function renderSlotStatus() {
+    const el = document.getElementById('slotStatus');
+    if (bookedStatus === 'loading') {
+      el.innerHTML = '時段載入中…';
+    } else if (bookedStatus === 'error') {
+      el.innerHTML = '時段載入失敗，暫時無法選擇。<span class="slot-retry" id="slotRetry">重新載入</span>';
+      document.getElementById('slotRetry').addEventListener('click', refreshBookedSlots);
+    } else if (!state.date) {
+      el.innerHTML = '請先選擇日期';
+    } else {
+      el.innerHTML = '';
+    }
   }
 
   function isSlotBooked(date, slot) {
@@ -704,37 +842,56 @@ function loadBookedSlots() {
     return bookedSlots[dateStr + '_' + slot] === true;
   }
 
-  function isSlotPast(date, slot) {
-    const now = new Date();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (!date || date > today) return false;
-    if (date < today) return true;
-    const [h, m] = slot.split(':').map(Number);
-    const slotTime = new Date(date);
-    slotTime.setHours(h, m, 0, 0);
-    return now >= slotTime;
+  // 未達最短提前天數的日期，所有時段都不開放
+  function isSlotPast(date) {
+    return !!date && date < earliestBookable();
   }
   
   function updateTimeSlots() {
+    // 還沒確認已約時段前，全部時段先鎖住，避免重複預約
+    const locked = bookedStatus !== 'ok' || !state.date;
     document.querySelectorAll('.time-slot').forEach(el => {
       const slot = el.dataset.slot;
-      if (isSlotBooked(state.date, slot) || isSlotPast(state.date, slot)) {
-        el.classList.add('booked');
+      el.classList.toggle('locked', locked);
+      if (locked || isSlotBooked(state.date, slot) || isSlotPast(state.date)) {
+        if (!locked) el.classList.add('booked');
         el.classList.remove('selected');
         if (state.slot === slot) {
           state.slot = null;
           checkPage1();
         }
-      } else {
+      }
+      if (locked || !(isSlotBooked(state.date, slot) || isSlotPast(state.date))) {
         el.classList.remove('booked');
       }
     });
+    renderSlotStatus();
   }
   
   document.getElementById('btnConfirm').addEventListener('click', async () => {
     const btn = document.getElementById('btnConfirm');
     btn.disabled = true;
+    btn.textContent = '確認時段中…';
+
+    // 送出前再抓一次已約時段，避免填資料期間被別人約走
+    const loaded = await loadBookedSlots();
+    if (!loaded) {
+      alert('目前無法確認時段是否仍可預約，請確認連線後再試。');
+      btn.disabled = false;
+      btn.textContent = '確認預約';
+      return;
+    }
+    if (isSlotBooked(state.date, state.slot)) {
+      alert('很抱歉，這個時段剛剛已被預約，請重新選擇時段。');
+      btn.disabled = false;
+      btn.textContent = '確認預約';
+      document.getElementById('agreeWrap').classList.remove('checked');
+      btn.disabled = true;
+      bookedStatus = 'ok';
+      updateTimeSlots();
+      showPage(1);
+      return;
+    }
     btn.textContent = '送出中…';
 
     const d = state.date;
@@ -745,7 +902,7 @@ function loadBookedSlots() {
       slot:         state.slot,
       removal:      svcState['卸甲'].item,
       removalAddon: svcState['卸甲'].addon || '',
-      gel:          svcState['凝膠'].item,
+      gel:          svcState['凝膠'].item || '無',
       gelAddon:     svcState['凝膠'].addon || '',
       name:         state.name,
       ig:           state.ig,
@@ -761,12 +918,20 @@ function loadBookedSlots() {
       });
       const result = await res.json();
 
-     if (result.success) {
+     if (result.code === 'SLOT_TAKEN') {
+        alert(result.error);
+        btn.textContent = '確認預約';
+        document.getElementById('agreeWrap').classList.remove('checked');
+        await refreshBookedSlots();
+        showPage(1);
+      } else if (result.success) {
         setupCalendarButtons();
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('successPage').style.display = 'block';
         updateSteps(5);
       } else {
+        // 驗證碼過期時要重新驗證
+        if ((result.error || '').includes('驗證碼')) state.verifiedEmail = '';
         alert('送出失敗，請稍後再試。\n（' + (result.error || '未知錯誤') + '）');
         btn.disabled = false;
         btn.textContent = '確認預約';
@@ -816,7 +981,7 @@ function loadBookedSlots() {
     const details = encodeURIComponent(
       '卸甲：' + svcState['卸甲'].item +
       (svcState['卸甲'].addon ? ' ＋' + svcState['卸甲'].addon : '') + '\n' +
-      '凝膠：' + svcState['凝膠'].item +
+      '凝膠：' + (svcState['凝膠'].item || '無') +
       (svcState['凝膠'].addon ? ' ＋' + svcState['凝膠'].addon : '')
     );
  
@@ -854,7 +1019,7 @@ function loadBookedSlots() {
   function resetAll() {
     state.date = null; state.slot = null; state.service = null; state.price = 0; state.dur = '';
     state.name = ''; state.ig = ''; state.email = ''; state.note = '';
-    state.calYear = 2026; state.calMonth = 4;
+    goToOpeningMonth();
     ['卸甲','凝膠'].forEach(cat => { svcState[cat] = { item: null, addon: null, itemPrice: 0, addonPrice: 0 }; });
     document.querySelectorAll('.time-slot').forEach(c => c.classList.remove('selected'));
     initBlocks();
@@ -864,13 +1029,18 @@ function loadBookedSlots() {
     document.getElementById('btnConfirm').disabled = true;
     document.getElementById('fVerifyCode').value = '';
 state.verifyCode = '';
+    state.verifiedEmail = '';
+    document.getElementById('block-凝膠').style.display = '';
+    checkPage1();
+    renderCalendar();
     showPage(1);
+    // 剛送出的時段要重新抓，避免同一位客人再約到同一格
+    refreshBookedSlots();
   }
- 
+
+  goToOpeningMonth();
   renderCalendar();
-loadBookedSlots().then(() => {
-  updateTimeSlots();
-});
+  refreshBookedSlots();
 </script>
 </body>
 </html>
