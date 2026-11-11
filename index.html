@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nyorong nail 嬉希工作室 — 線上預約</title>
+  <meta name="description" content="nyorong nail 嬉希工作室線上預約：選擇日期、時段與服務項目，送出後將以 IG 私訊確認。">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="nyorong nail 嬉希工作室">
+  <meta property="og:title" content="nyorong nail 嬉希工作室 — 線上預約">
+  <meta property="og:description" content="選擇日期、時段與服務項目，送出後將以 IG 私訊確認。">
+  <meta property="og:url" content="https://nyorong-living.github.io/reservation/">
+  <meta property="og:locale" content="zh_TW">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌸%3C/text%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,9 +41,11 @@
 
     .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .cal-title { font-size: 14px; font-weight: 500; letter-spacing: 0.05em; }
-    .cal-nav { background: none; border: 0.5px solid #c6d8e6; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .cal-nav { position: relative; background: none; border: 0.5px solid #c6d8e6; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 13px; color: #666; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
     .cal-nav:hover:not(:disabled) { border-color: #f97279; color: #f97279; }
     .cal-nav:disabled { opacity: 0.25; cursor: default; }
+    /* 外觀維持 28px，可點範圍擴大到 44px */
+    .cal-nav::after { content: ''; position: absolute; inset: -9px; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .cal-dow { text-align: center; font-size: 10px; color: #aaa; letter-spacing: 0.08em; padding: 4px 0 8px; }
     .cal-dow.weekend { color: #f97279; }
@@ -48,8 +58,10 @@
     .cal-day.today::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #f97279; }
     .cal-day.today.selected { color: #fff !important; }
     .cal-day.today.selected::after { background: #fff; }
-    .cal-day.past { color: #ccc !important; cursor: default; }
-    .cal-day.past.weekend { color: #f5b8bb !important; }
+    .cal-day.past, .cal-day.disabled, .cal-day.full { color: #ccc !important; cursor: default; }
+    .cal-day.past.weekend, .cal-day.disabled.weekend, .cal-day.full.weekend { color: #f5b8bb !important; }
+    .cal-day.available { font-weight: 500; }
+    .cal-day.full { text-decoration: line-through; }
     .cal-day.available::before { content: ''; position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #c6d8e6; }
     .cal-day.available.selected::before { background: rgba(255,255,255,0.6); }
 
@@ -90,14 +102,15 @@
     
     .form-group { margin-bottom: 1rem; }
     .form-label { font-size: 11px; letter-spacing: 0.12em; color: #aaa; display: block; margin-bottom: 6px; text-transform: uppercase; }
-    .form-input { width: 100%; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
+    .form-input { width: 100%; border: 0.5px solid #c6d8e6; border-radius: 8px; padding: 10px 14px; font-size: 16px; font-family: 'Jost', sans-serif; background: #fff; color: #2a2a2a; transition: border-color 0.2s; }
     .form-input:focus { outline: none; border-color: #f97279; }
+    .req { color: #f97279; margin-left: 2px; }
  
     .summary-card { border: 0.5px solid #e8f1f6; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; background: #e8f1f6; }
-    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #c6d8e6; }
+    .summary-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 6px 0; font-size: 13px; border-bottom: 0.5px solid #c6d8e6; }
     .summary-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; margin-top: 4px; }
-    .summary-label { color: #666; }
-    .summary-value { color: #2a2a2a; }
+    .summary-label { color: #666; flex-shrink: 0; }
+    .summary-value { color: #2a2a2a; text-align: right; white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
     .summary-value.price { color: #f97279; }
 
     .btn-primary { width: 100%; background: #c6d8e6; border: none; border-radius: 8px; padding: 14px; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; cursor: pointer; font-family: 'Jost', sans-serif; transition: background 0.2s; margin-bottom: 0.75rem; }
@@ -120,6 +133,7 @@
     .terms-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7aaac0; margin-bottom: 1rem; }
     .terms-body p { font-size: 12px; color: #666; line-height: 1.8; margin-bottom: 0.5rem; }
     .terms-body p:last-child { margin-bottom: 0; }
+    .terms-body strong { font-weight: 500; color: #2a2a2a; }
     .agree-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding: 12px 14px; border: 0.5px solid #e0dce8; border-radius: 8px; cursor: pointer; transition: border-color 0.2s; }
     .agree-wrap:hover { border-color: #f97279; }
     .agree-wrap.checked { border-color: #c6d8e6; background: #e8f1f6; }
@@ -220,18 +234,18 @@
       <div class="section-title">填寫個人資料</div>
       <p class="form-notice">所有資料作為工作室顧客聯絡及資料管理使用，不另作推銷與其他用途。</p>
       <div class="form-group">
-        <label class="form-label" for="fName">如何稱呼</label>
-        <input class="form-input" type="text" placeholder="姓名或暱稱皆可" id="fName" aria-describedby="errName">
+        <label class="form-label" for="fName">如何稱呼<span class="req" aria-hidden="true">＊</span></label>
+        <input class="form-input" type="text" placeholder="姓名或暱稱皆可" id="fName" aria-describedby="errName" aria-required="true" autocomplete="name">
         <p class="field-error" id="errName"></p>
       </div>
       <div class="form-group">
-        <label class="form-label" for="fIG">IG 帳號（即時聯絡用）</label>
-        <input class="form-input" type="text" placeholder="" id="fIG" aria-describedby="errIG">
+        <label class="form-label" for="fIG">IG 帳號（即時聯絡用）<span class="req" aria-hidden="true">＊</span></label>
+        <input class="form-input" type="text" placeholder="例：nyorong.nail" id="fIG" aria-describedby="errIG" aria-required="true" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="off">
         <p class="field-error" id="errIG"></p>
       </div>
       <div class="form-group">
-  <label class="form-label" for="fEmail">電子郵件</label>
-  <input class="form-input" type="email" placeholder="" id="fEmail" aria-describedby="errEmail">
+  <label class="form-label" for="fEmail">電子郵件<span class="req" aria-hidden="true">＊</span></label>
+  <input class="form-input" type="email" inputmode="email" placeholder="" id="fEmail" aria-describedby="errEmail" aria-required="true" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email">
   <p class="field-error" id="errEmail"></p>
   <p style="font-size:11px; color:#aaa; margin-top:6px; line-height:1.6;">預約確認及相關通知將寄送至此信箱，請務必填寫正確。</p>
 </div>
@@ -249,7 +263,7 @@
   <div class="section-title">驗證電子郵件</div>
   <p class="form-notice">驗證碼已寄送至 <span id="verifyEmailHint" style="color:#5a9ab5;"></span>，請於 10 分鐘內輸入。</p>
   <div class="verify-wrap">
-    <input class="verify-input" type="text" inputmode="numeric" maxlength="6" placeholder="000000" id="fVerifyCode" aria-label="六位數驗證碼" autocomplete="one-time-code">
+    <input class="verify-input" type="text" inputmode="numeric" placeholder="000000" id="fVerifyCode" aria-label="六位數驗證碼" autocomplete="one-time-code">
     <p class="verify-error" id="verifyError" role="alert"></p>
     <p class="verify-hint">若未收到信件，請確認垃圾郵件資料夾。</p>
     <button type="button" class="verify-resend" id="btnResend">重新發送驗證碼</button>
@@ -265,9 +279,9 @@
       <div class="terms-card">
         <div class="terms-title">預約須知</div>
         <div class="terms-body">
-          <p>1. 場地空間有限，且公共空間與其他工作室共用，恕不接受攜伴。</p>
-          <p>2. 預約成功後如需更改時間，請提前兩天以上告知。</p>
-          <p>3. 本店秉持信任原則，不額外收取訂金與取消費，當天約定時間遲到 15 分鐘以上且未主動告知，視為自動取消。日後也將不再受理任何預約。</p>
+          <p>1. 場地空間有限，且公共空間與其他工作室共用，<strong>恕不接受攜伴</strong>。</p>
+          <p>2. 預約成功後如需更改時間，<strong>請提前兩天以上告知</strong>。</p>
+          <p>3. 本店秉持信任原則，不額外收取訂金與取消費，當天約定時間<strong>遲到 15 分鐘以上且未主動告知，視為自動取消</strong>。日後也將不再受理任何預約。</p>
           <p>4. 本店各服務項目訂價已盡量公開透明，恕不接受議價、事後付款。</p>
           <p>5. 為維持服務品質與良好成品，請務必保留充裕時間，恕不接受任何形式與理由的催趕。</p>
           <p>🌝 客人有選擇美甲師的權利，美甲師也有權利決定是否提供服務。如在施作過程中，雙方有無法解決的認知落差或溝通歧異，我方有權終止服務。</p>
@@ -311,6 +325,26 @@
     name: '', ig: '', email: '', note: '',
     calYear: 0, calMonth: 0  // 由 openingMonth() 決定
   };
+
+  // 目前所在頁面：1 | 2 | 3 | '3v' | 4 | 'done'
+  let currentPage = 1;
+
+  // 來源追蹤：記下網址上的 UTM 參數，送出預約時一併寫入
+  const UTM = {};
+  (() => {
+    const params = new URLSearchParams(location.search);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(k => {
+      const v = params.get(k);
+      if (v) UTM[k] = v.slice(0, 100);
+    });
+  })();
+
+  // HTML 跳脫：客人填的文字放進 innerHTML 前先處理
+  function esc(text) {
+    return String(text == null ? '' : text).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
 
   // 可預約日期：key = "YYYY-M"（月份 1-based）
   // 實際以 Google Sheet「可預約日期」工作表為準，載入後會被覆蓋；
@@ -386,7 +420,126 @@
   const pg = document.getElementById('page' + n);
   if (pg) pg.classList.add('active');
   if (typeof n === 'number') updateSteps(n);
+  currentPage = n;
+  window.scrollTo(0, 0);
+  persist();
 }
+
+  // 選好的日期或時段失效時，帶客人回第一步重新選
+  function backToPage1(msg) {
+    if (currentPage !== 1 && currentPage !== 'done') {
+      setAgree(false);
+      showPage(1);
+    }
+    showError('err1', msg);
+  }
+
+  // ── 進度暫存 ───────────────────────────────────────
+  // 客人切到信箱 App 看驗證碼時，頁面可能被重新載入；把進度存在這台裝置上，2 小時內回來可接續
+  const STORE_KEY = 'nyorongReservation';
+  const STORE_TTL = 2 * 60 * 60 * 1000;
+  let restoring = false;
+
+  function persist() {
+    if (restoring || currentPage === 'done') return;
+    try {
+      const d = state.date;
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        savedAt: Date.now(),
+        page: currentPage,
+        date: d ? [d.getFullYear(), d.getMonth(), d.getDate()] : null,
+        slot: state.slot,
+        svc: svcState,
+        form: {
+          name: document.getElementById('fName').value,
+          ig: document.getElementById('fIG').value,
+          email: document.getElementById('fEmail').value,
+          note: document.getElementById('fNote').value,
+        },
+        verifiedEmail: state.verifiedEmail || '',
+        verifyCode: state.verifyCode || '',
+        codeSentTo: state.codeSentTo || '',
+        codeSentAt: state.codeSentAt || 0,
+        utm: UTM,
+      }));
+    } catch (e) { /* 無痕模式等情況無法儲存，不影響預約 */ }
+  }
+
+  function clearSaved() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+  }
+
+  function restoreProgress() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) {}
+    if (!saved || !saved.savedAt || Date.now() - saved.savedAt > STORE_TTL) { clearSaved(); return; }
+    restoring = true;
+    try {
+      // 這次網址沒帶 UTM（例如重新整理後）就沿用上次記下的來源
+      if (Object.keys(UTM).length === 0 && saved.utm) Object.assign(UTM, saved.utm);
+
+      if (Array.isArray(saved.date)) {
+        const d = new Date(saved.date[0], saved.date[1], saved.date[2]);
+        if (d >= earliestBookable()) {
+          state.date = d;
+          state.slot = saved.slot || null;
+          state.calYear = d.getFullYear();
+          state.calMonth = d.getMonth();
+        }
+      }
+
+      // 服務項目以目前的價目表為準，暫存只用來還原「選了哪一項」
+      ['卸甲', '凝膠'].forEach(cat => {
+        const s = saved.svc && saved.svc[cat];
+        const item = s && SERVICES[cat].items.find(i => i.name === s.item);
+        if (!item) return;
+        const addon = item.showAddon ? SERVICES[cat].addons.find(a => a.name === s.addon) : null;
+        svcState[cat] = {
+          item: item.name,
+          addon: addon ? addon.name : null,
+          itemPrice: typeof item.price === 'number' ? item.price : 0,
+          addonPrice: addon ? addon.price : 0,
+        };
+      });
+      const removal = SERVICES['卸甲'].items.find(i => i.name === svcState['卸甲'].item);
+      const gelLocked = !!(removal && removal.disablesGel);
+      document.getElementById('block-凝膠').style.display = gelLocked ? 'none' : '';
+      if (gelLocked) svcState['凝膠'] = { item: null, addon: null, itemPrice: 0, addonPrice: 0 };
+      initBlocks();
+      checkPage2();
+
+      const form = saved.form || {};
+      document.getElementById('fName').value = form.name || '';
+      document.getElementById('fIG').value = form.ig || '';
+      document.getElementById('fEmail').value = form.email || '';
+      document.getElementById('fNote').value = form.note || '';
+      state.name = (form.name || '').trim();
+      state.ig = normalizeIG(form.ig || '');
+      state.email = (form.email || '').trim();
+      state.note = form.note || '';
+      state.verifiedEmail = saved.verifiedEmail || '';
+      state.verifyCode = saved.verifyCode || '';
+      state.codeSentTo = saved.codeSentTo || '';
+      state.codeSentAt = saved.codeSentAt || 0;
+
+      // 回到離開時的頁面；前面步驟的資料不完整就退回該步驟
+      const servicesDone = svcState['卸甲'].item !== null && (gelLocked || svcState['凝膠'].item !== null);
+      const infoDone = !!(state.name && state.ig && state.email);
+      let target = saved.page;
+      if (!state.date || !state.slot) target = 1;
+      else if (target !== 1 && !servicesDone) target = 2;
+      else if (target === '3v' && !(infoDone && state.email === state.codeSentTo && Date.now() - state.codeSentAt < VERIFY_TTL * 1000)) target = 3;
+      else if (target === 4 && !(infoDone && state.email === state.verifiedEmail)) target = 3;
+      if (![1, 2, 3, '3v', 4].includes(target)) target = 1;
+
+      if (target === '3v') showVerifyPage();
+      else if (target === 4) { renderSummary(); showPage(4); }
+      else showPage(target);
+    } catch (e) {
+      console.warn('無法還原上次的預約進度', e);
+    }
+    restoring = false;
+  }
 
   function updateSteps(n) {
     document.querySelectorAll('.step').forEach(s => {
@@ -457,6 +610,11 @@
         el.classList.add('past');
         el.disabled = true;
         el.setAttribute('aria-label', label + '，不開放預約');
+      } else if (available && isDateFull(thisDate)) {
+        el.classList.add('full');
+        el.disabled = true;
+        el.title = '已額滿';
+        el.setAttribute('aria-label', label + '，已額滿');
       } else if (available) {
         el.classList.add('available');
         const isSelected = !!state.date && state.date.toDateString() === thisDate.toDateString();
@@ -472,6 +630,7 @@
           if (again) again.focus();
           checkPage1();
           updateTimeSlots();
+          persist();
         });
       } else {
         el.classList.add('disabled');
@@ -508,6 +667,7 @@
       state.slot = el.dataset.slot;
       showError('err1', '');
       checkPage1();
+      persist();
     });
   });
 
@@ -631,6 +791,7 @@
           }
         }
         checkPage2();
+        persist();
       });
       body.appendChild(el);
 
@@ -664,6 +825,7 @@
           svcState[cat].addonPrice = svcState[cat].addon ? addon.price : 0;
           renderBlock(cat);
           refocus(addon.name);
+          persist();
         });
         body.appendChild(el);
       });
@@ -797,10 +959,23 @@
   FIELDS.forEach(f => {
     document.getElementById(f.id).addEventListener('input', () => setFieldError(f, ''));
   });
+  ['fName', 'fIG', 'fEmail', 'fNote'].forEach(id => {
+    document.getElementById(id).addEventListener('input', persist);
+  });
+
+  // IG 帳號：去掉開頭的 @，貼上整段個人頁網址時只留帳號
+  function normalizeIG(value) {
+    return value.trim()
+      .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+      .replace(/^@+/, '')
+      .replace(/[\/?#].*$/, '')
+      .trim();
+  }
 
 document.getElementById('btn3').addEventListener('click', async () => {
   const n = document.getElementById('fName').value.trim();
-  const ig = document.getElementById('fIG').value.trim();
+  const ig = normalizeIG(document.getElementById('fIG').value);
+  document.getElementById('fIG').value = ig;
   const email = document.getElementById('fEmail').value.trim();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const messages = [
@@ -868,6 +1043,14 @@ document.getElementById('btn3v').addEventListener('click', async () => {
 
 document.getElementById('back3v').addEventListener('click', () => showPage(3));
 
+// 驗證碼只收數字，輸入滿六碼自動送出驗證
+document.getElementById('fVerifyCode').addEventListener('input', e => {
+  const digits = e.target.value.replace(/\D/g, '').slice(0, 6);
+  if (digits !== e.target.value) e.target.value = digits;
+  const btn = document.getElementById('btn3v');
+  if (digits.length === 6 && !btn.disabled) btn.click();
+});
+
 document.getElementById('btnResend').addEventListener('click', async () => {
   await sendVerificationCode();
 });
@@ -897,7 +1080,7 @@ document.getElementById('btnResend').addEventListener('click', async () => {
       ['參考費用', 'NT$' + total.toLocaleString() + (hasCustom ? '（客製化費用另計）' : '')],
     ];
     document.getElementById('summaryCard').innerHTML = rows.map((r, i) =>
-      `<div class="summary-row"><span class="summary-label">${r[0]}</span><span class="summary-value${i===rows.length-1?' price':''}">${r[1]}</span></div>`
+      `<div class="summary-row"><span class="summary-label">${esc(r[0])}</span><span class="summary-value${i===rows.length-1?' price':''}">${esc(r[1])}</span></div>`
     ).join('');
   }
 
@@ -953,6 +1136,7 @@ document.getElementById('btnResend').addEventListener('click', async () => {
       state.date = null;
       state.slot = null;
       checkPage1();
+      backToPage1('很抱歉，原先選的日期目前不開放預約，請重新選擇。');
     }
     if (!state.date) goToOpeningMonth();
     renderCalendar();
@@ -964,8 +1148,21 @@ document.getElementById('btnResend').addEventListener('click', async () => {
     updateTimeSlots();
     const ok = await loadBookedSlots();
     bookedStatus = ok ? 'ok' : 'error';
-    updateTimeSlots();
+    syncBooked();
     return ok;
+  }
+
+  // 已約時段更新後，同步日曆的額滿標示與時段狀態
+  function syncBooked() {
+    if (state.date && isDateFull(state.date)) {
+      state.date = null;
+      state.slot = null;
+      checkPage1();
+      backToPage1('很抱歉，原先選的日期已額滿，請重新選擇。');
+    }
+    renderCalendar();
+    updateTimeSlots();
+    persist();
   }
 
   function renderSlotStatus() {
@@ -988,6 +1185,12 @@ document.getElementById('btnResend').addEventListener('click', async () => {
     return bookedSlots[dateStr + '_' + slot] === true;
   }
 
+  // 當天所有時段都被約走；已約時段還沒載入前一律視為未額滿
+  const SLOTS = [...document.querySelectorAll('.time-slot')].map(el => el.dataset.slot);
+  function isDateFull(date) {
+    return bookedStatus === 'ok' && SLOTS.every(slot => isSlotBooked(date, slot));
+  }
+
   // 未達最短提前天數的日期，所有時段都不開放
   function isSlotPast(date) {
     return !!date && date < earliestBookable();
@@ -1002,14 +1205,15 @@ document.getElementById('btnResend').addEventListener('click', async () => {
       el.classList.toggle('locked', locked);
       el.classList.toggle('booked', taken);
       el.disabled = locked || taken;
-      if (locked || taken) {
-        el.classList.remove('selected');
-        el.setAttribute('aria-pressed', 'false');
-        if (state.slot === slot) {
-          state.slot = null;
-          checkPage1();
-        }
+      // 載入中只是暫時鎖住，不清掉已選時段；確定被約走才清
+      if (state.slot === slot && (taken || !state.date)) {
+        state.slot = null;
+        checkPage1();
+        if (taken) backToPage1('很抱歉，這個時段剛剛已被預約，請重新選擇時段。');
       }
+      const selected = !locked && !taken && state.slot === slot;
+      el.classList.toggle('selected', selected);
+      el.setAttribute('aria-pressed', selected ? 'true' : 'false');
     });
     renderSlotStatus();
   }
@@ -1028,11 +1232,16 @@ document.getElementById('btnResend').addEventListener('click', async () => {
       btn.textContent = '確認預約';
       return;
     }
+    // 可預約日期在這期間被關閉時，applyAvailable 已帶回第一步
+    if (!state.date || !state.slot) {
+      btn.textContent = '確認預約';
+      return;
+    }
     if (isSlotBooked(state.date, state.slot)) {
       btn.textContent = '確認預約';
       setAgree(false);
       bookedStatus = 'ok';
-      updateTimeSlots();
+      syncBooked();
       showPage(1);
       showError('err1', '很抱歉，這個時段剛剛已被預約，請重新選擇時段。');
       return;
@@ -1054,6 +1263,12 @@ document.getElementById('btnResend').addEventListener('click', async () => {
       email:        state.email || '',
       note:         state.note  || '',
       verifyCode:   state.verifyCode || '',
+      // 來源追蹤（沒有帶 UTM 的連結會是空字串）
+      utmSource:    UTM.utm_source   || '',
+      utmMedium:    UTM.utm_medium   || '',
+      utmCampaign:  UTM.utm_campaign || '',
+      utmContent:   UTM.utm_content  || '',
+      utmTerm:      UTM.utm_term     || '',
     };
 
     try {
@@ -1071,6 +1286,8 @@ document.getElementById('btnResend').addEventListener('click', async () => {
         showError('err1', result.error);
       } else if (result.success) {
         setupCalendarButtons();
+        currentPage = 'done';
+        clearSaved();
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('successPage').style.display = 'block';
         updateSteps(5);
@@ -1207,6 +1424,9 @@ document.getElementById('btnResend').addEventListener('click', async () => {
 state.verifyCode = '';
     state.verifiedEmail = '';
     state.codeSentTo = '';
+    state.codeSentAt = 0;
+    clearSaved();
+    currentPage = 1;
     document.getElementById('block-凝膠').style.display = '';
     checkPage1();
     renderCalendar();
@@ -1216,7 +1436,9 @@ state.verifyCode = '';
   }
 
   goToOpeningMonth();
+  restoreProgress();
   renderCalendar();
+  checkPage1();
   refreshBookedSlots();
 </script>
 </body>
